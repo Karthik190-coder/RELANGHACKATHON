@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math"
 	"os"
+	"time"
 )
 
 const (
@@ -73,6 +74,8 @@ func main() {
 
 		fmt.Fprintf(w, "\033[H%s", string(pixels))
 		w.Flush()
+
+		time.Sleep(37 * time.Millisecond)
 
 		angle1 += 0.30
 		angle2 += 0.15
