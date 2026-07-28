@@ -659,7 +659,7 @@ for (const prefix of apiPaths) {
   router.get([`${prefix}/status/`, `${prefix}/status`], (req: Request, res: Response) => {
     try {
       db.prepare("SELECT 1").get();
-      res.setHeader("Content-Type", "text/plain");
+      res.setHeader("Content-Type", "text/html; charset=utf-8");
       res.status(200).send("OK");
     } catch (e) {
       res.status(500).send("Internal Server Error");

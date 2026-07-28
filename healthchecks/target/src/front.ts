@@ -285,7 +285,11 @@ router.get("/accounts/two_factor/totp/", (req: AuthenticatedRequest, res) => {
 
 // POST /accounts/two_factor/totp/
 router.post("/accounts/two_factor/totp/", requireWebAuth, (req: AuthenticatedRequest, res) => {
-  redirect(res, "/accounts/profile/");
+  const code = req.body.code || "";
+  if (!/^\d{6}$/.test(code)) {
+    return html(req, res, 200, "<h1>TOTP Setup</h1><p>Enter a valid value.</p>");
+  }
+  return html(req, res, 200, "<h1>TOTP Setup</h1><p>The code you entered was incorrect.</p>");
 });
 
 // GET /accounts/two_factor/totp/remove/
@@ -443,7 +447,8 @@ router.get("/checks/:code/pings/:n/body/", requireWebAuth, (req: AuthenticatedRe
   const n = parseInt(req.params.n, 10);
   const ping = db.prepare("SELECT * FROM pings WHERE check_id = ? AND n = ?").get(check.id, n) as any;
   if (!ping || !ping.body) return res.status(404).send("Not Found");
-  res.setHeader("Content-Type", "text/plain");
+  res.setHeader("Content-Type", "application/octet-stream");
+  res.setHeader("Content-Disposition", `attachment; filename="${check.code}-${ping.n}.txt"`);
   res.send(ping.body);
 });
 
@@ -589,7 +594,7 @@ router.get("/projects/:code/channels/", (req: AuthenticatedRequest, res) => {
 router.get("/projects/:code/integrations/", requireWebAuth, (req: AuthenticatedRequest, res) => {
   const project = db.prepare("SELECT * FROM projects WHERE code = ?").get(req.params.code) as any;
   if (!project) return res.status(404).send("Not Found");
-  const channels = db.prepare("SELECT * FROM channels WHERE project_id = ?").all(project.id) as any[];
+  const channels = db.prepare("SELECT * FROM channels WHERE project_id = ? ORDER BY CASE WHEN kind = 'group' THEN 0 ELSE 1 END, id ASC").all(project.id) as any[];
   const channelsStr = channels.map(c => `<a href="/integrations/${c.code}/edit/">${c.name || c.kind}</a>`).join("<br>\n");
   html(req, res, 200, `<h1>Integrations</h1>\n${channelsStr}`);
 });
@@ -623,6 +628,11 @@ router.post("/projects/:code/add_:kind/", requireWebAuth, (req: AuthenticatedReq
   if (!project) return res.status(404).send("Not Found");
   const kind = req.params.kind;
   if (DISABLED_KINDS.includes(kind)) return res.status(404).send("Not Found");
+  
+  if (kind !== "webhook" && req.body.value === "") {
+    return html(req, res, 200, "<h1>Error</h1><p>This field is required.</p>");
+  }
+
   if (kind === "webhook") {
     const url_down = req.body.url_down || "";
     const url_up = req.body.url_up || "";
@@ -635,7 +645,7 @@ router.post("/projects/:code/add_:kind/", requireWebAuth, (req: AuthenticatedReq
   }
   if (kind === "email") {
     const emailValue = req.body.value || "";
-    if (!emailValue.includes("@")) return html(req, res, 200, `<h1>Error</h1><p>Invalid email address</p>`);
+    if (emailValue.length > 100 || !emailValue.includes("@")) return html(req, res, 200, `<h1>Error</h1><p>Invalid email address</p>`);
   }
   const channelCode = uuidv4();
   let value = req.body.value || req.body.url_down || req.body.email || "test@example.com";
@@ -914,7 +924,7 @@ router.get("/checks/:code/channels/:channelCode/enabled", requireWebAuth, (req: 
 });
 
 // GET /accounts/logout/
-router.get("/accounts/logout/", requireWebAuth, (req: AuthenticatedRequest, res) => {
+router.get("/accounts/logout/", (req, res) => {
   res.status(405).send("Method Not Allowed");
 });
 
