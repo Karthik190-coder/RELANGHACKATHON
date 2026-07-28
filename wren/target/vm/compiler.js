@@ -31,6 +31,7 @@ class Compiler {
     this.vm = vm;
     this.parent = parent;
     this.fn = new ObjFn();
+    this.fn.isInitializer = isInitializer;
     this.isInitializer = isInitializer;
     this.enclosingClass = parent ? parent.enclosingClass : null;
 
@@ -131,6 +132,11 @@ class Parser {
     this.emitByte(b2);
   }
 
+  emitShort(value) {
+    this.emitByte(value & 0xff);
+    this.emitByte((value >> 8) & 0xff);
+  }
+
   emitOp(op) {
     this.emitByte(op);
   }
@@ -171,7 +177,7 @@ class Parser {
 
   emitReturn() {
     if (this.compiler.isInitializer) {
-      this.emitBytes(OP.LOAD_LOCAL_0);
+      this.emitOp(OP.LOAD_LOCAL_0);
     } else {
       this.emitOp(OP.NULL);
     }
@@ -352,19 +358,24 @@ class Parser {
     if (this.match(TokenType.TOKEN_STATIC)) isStatic = true;
     if (this.match(TokenType.TOKEN_CONSTRUCT)) isConstruct = true;
 
-    let methodSymbol = this.methodSignature();
-    const symbolIndex = this.vm.ensureSymbol(methodSymbol);
+    let methodSymbol;
+    let symbolIndex;
 
     if (isForeign) {
+      methodSymbol = this.methodSignature();
+      symbolIndex = this.vm.ensureSymbol(methodSymbol);
       this.emitConstant(methodSymbol);
     } else {
+      // Parameters belong to the method compiler, not the surrounding class
+      // compiler. Declaring them before switching compilers caused methods
+      // and constructors to lose their parameter bindings in their bodies.
       const methodCompiler = new Compiler(this.vm, this.compiler, isConstruct);
-      methodCompiler.fn.name = methodSymbol;
-
       const prevCompiler = this.compiler;
       this.compiler = methodCompiler;
-
       this.beginScope();
+      methodSymbol = this.methodSignature();
+      symbolIndex = this.vm.ensureSymbol(methodSymbol);
+      methodCompiler.fn.name = methodSymbol;
       this.consume(TokenType.TOKEN_LEFT_BRACE, "Expect '{' before method body.");
       this.block();
       this.emitReturn();
@@ -377,9 +388,11 @@ class Parser {
     this.namedVariable(classNameToken, false);
 
     if (isConstruct || isStatic) {
-      this.emitBytes(OP.METHOD_STATIC, symbolIndex);
+      this.emitByte(OP.METHOD_STATIC);
+      this.emitShort(symbolIndex);
     } else {
-      this.emitBytes(OP.METHOD_INSTANCE, symbolIndex);
+      this.emitByte(OP.METHOD_INSTANCE);
+      this.emitShort(symbolIndex);
     }
   }
 
