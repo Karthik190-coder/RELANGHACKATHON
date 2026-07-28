@@ -1,0 +1,5 @@
+TEST: 10_sha512_0073
+--- expected repr:
+'a1491e88fdfc78dbb76032bbef0e188015f2a5c95d6f764f19f6c9b0d4cc30bfc66c20e94c5a0ebfa40ae0f469a7f35b7a89d6f519136b6842b4b1f701a5cfae:\n'
+--- actual repr:
+''

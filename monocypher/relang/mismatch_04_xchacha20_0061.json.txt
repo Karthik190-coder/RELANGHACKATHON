@@ -1,0 +1,5 @@
+TEST: 04_xchacha20_0061
+--- expected repr:
+'9f:\n261fb3d3b8350671:\n'
+--- actual repr:
+''

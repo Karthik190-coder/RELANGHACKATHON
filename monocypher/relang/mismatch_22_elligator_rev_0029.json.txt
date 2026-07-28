@@ -1,0 +1,5 @@
+TEST: 22_elligator_rev_0029
+--- expected repr:
+'ff:\n'
+--- actual repr:
+''

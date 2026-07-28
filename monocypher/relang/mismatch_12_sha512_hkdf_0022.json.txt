@@ -1,0 +1,5 @@
+TEST: 12_sha512_hkdf_0022
+--- expected repr:
+'a204967af9c25f7f:\n'
+--- actual repr:
+''

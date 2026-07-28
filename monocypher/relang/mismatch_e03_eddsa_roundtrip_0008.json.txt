@@ -1,0 +1,5 @@
+TEST: e03_eddsa_roundtrip_0008
+--- expected repr:
+'00:\n'
+--- actual repr:
+'ff:\n'

@@ -1,0 +1,5 @@
+TEST: 14_x25519_0257
+--- expected repr:
+'affd7f5119098905df9df4c74ab2b38ce76d6ef9771df57d249cd642b9faad54:\n'
+--- actual repr:
+'615ab637b3579547fb573fd621f02146eaec61e58cdaddc430033c771eb61547:\n'

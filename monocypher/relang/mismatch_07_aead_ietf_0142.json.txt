@@ -1,0 +1,5 @@
+TEST: 07_aead_ietf_0142
+--- expected repr:
+'1dfbd4d5806ca1a091a1e8520646cf9da4a1ff7b229c6f23babce7ba7f159ecccca8883fd9b3b143bebe85abd0da0a6c0b83c85c580ce845852cf564d2847a5e6f2bfc33311015fae84e06d9ebf6816d:\n05028d90f6a85ddb7ee0b00b763bb8cc:\n'
+--- actual repr:
+''

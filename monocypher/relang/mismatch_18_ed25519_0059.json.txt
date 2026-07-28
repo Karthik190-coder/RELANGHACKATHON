@@ -1,0 +1,5 @@
+TEST: 18_ed25519_0059
+--- expected repr:
+'7bdfc731f8a15d26b2ab4de0ff7e2dbb594a3a9fedfc81aa8af0479fae9628808df9b94c3b2bec62b6d86766562c423152b4834e6b9b4425c1c4ef473f5b590e:\n'
+--- actual repr:
+''

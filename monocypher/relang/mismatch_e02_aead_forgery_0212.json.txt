@@ -1,0 +1,5 @@
+TEST: e02_aead_forgery_0212
+--- expected repr:
+'ff:\n'
+--- actual repr:
+''

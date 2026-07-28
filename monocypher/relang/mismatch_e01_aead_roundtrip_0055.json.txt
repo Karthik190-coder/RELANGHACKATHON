@@ -1,0 +1,5 @@
+TEST: e01_aead_roundtrip_0055
+--- expected repr:
+'f8a3bb7f29cb33fa44f7f3338ec1d2daaba1f91b1c425cabfb59a39de4a92e0346c7f3f5837189eb9f1ebfa4fa600bcf863f621590ac0b53d9e9d52e9ac2e668c201fc7e8dc87ce5f73fafa0425a1c73bdf87f854ed78d4e59ff64c1b2e0232921535ee185aa45f041641b32cd38f0b9a83c6aa6bbd024fadb6d82e10c0a3b113e5f2217025e3ddc:\n00:\n'
+--- actual repr:
+''

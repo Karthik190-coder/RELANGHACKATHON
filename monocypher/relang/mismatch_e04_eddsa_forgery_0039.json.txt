@@ -1,0 +1,5 @@
+TEST: e04_eddsa_forgery_0039
+--- expected repr:
+'ff:\n'
+--- actual repr:
+''

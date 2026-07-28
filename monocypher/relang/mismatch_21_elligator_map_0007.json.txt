@@ -1,0 +1,5 @@
+TEST: 21_elligator_map_0007
+--- expected repr:
+'889b58c117ab99ba0d05353df5e0e2ca114656f779b12de61a88a536e6eaaa4c:\n'
+--- actual repr:
+''

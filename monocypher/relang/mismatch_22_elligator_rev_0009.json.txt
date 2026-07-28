@@ -1,0 +1,5 @@
+TEST: 22_elligator_rev_0009
+--- expected repr:
+'17d651596207c6f285669367ffe452a0138144f86a2cbe2b84ad6f759a4fcf55:\n00:\n'
+--- actual repr:
+'c3f02cdac460189d25e4802141a08a22e0be596ef3fde31929cb94d79d6cef6d:\n00:\n'

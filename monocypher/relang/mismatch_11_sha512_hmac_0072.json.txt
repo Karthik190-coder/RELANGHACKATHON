@@ -1,0 +1,5 @@
+TEST: 11_sha512_hmac_0072
+--- expected repr:
+'ab68adc8a30bd1a893091dd8fe461f13a45843135487fe3f6b072320cb44c883a1a2f2277b763549880eaf5558ce4305401e2ad1d5a3a51efa6c984309eae5de:\n'
+--- actual repr:
+''

@@ -1,0 +1,5 @@
+TEST: 09_blake2b_0036
+--- expected repr:
+'0eff8e02d79d8f6aef65fb73818c16456f62e0767ada17cc5515a8aee410492198e98cd1c5ec426d333c08b1b253fd319bbf079e61c07ea7d45f6aab300cfe04:\n'
+--- actual repr:
+''

@@ -1,0 +1,5 @@
+TEST: 16_eddsa_0159
+--- expected repr:
+'2054b441c2e34d8ca3a8663e0290d78378bb72e6878beb55c3a7e8759ce2436b:\n'
+--- actual repr:
+''

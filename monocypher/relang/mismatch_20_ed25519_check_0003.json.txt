@@ -1,0 +1,5 @@
+TEST: 20_ed25519_check_0003
+--- expected repr:
+'ff:\n'
+--- actual repr:
+''

@@ -1,0 +1,5 @@
+TEST: e09_elligator_compat_0001
+--- expected repr:
+'faf572fc49f8f09042b58125bc806daf7206c11d43dd7347bb4f72294822e46b:\n'
+--- actual repr:
+''

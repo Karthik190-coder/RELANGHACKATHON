@@ -1,0 +1,5 @@
+TEST: 13_argon2_0006
+--- expected repr:
+'a2b0825527056ecc:\n'
+--- actual repr:
+'ac7845ad54278401:\n'

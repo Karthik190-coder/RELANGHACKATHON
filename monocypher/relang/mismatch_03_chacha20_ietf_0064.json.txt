@@ -1,0 +1,5 @@
+TEST: 03_chacha20_ietf_0064
+--- expected repr:
+'6ad4fe979d5212db6bb7a4ba6c92890642d0cd4edfd0f4a7b65e267c01b5aeeb4ad30b7b387043f47546ba7c93d1b3af87ed4e5fbfa5aa42675637464be143c0fa38:\n49db3efd:\n'
+--- actual repr:
+''

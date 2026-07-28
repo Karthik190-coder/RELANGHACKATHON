@@ -1,0 +1,5 @@
+TEST: 15_x25519_pk_0024
+--- expected repr:
+'df2c9c7e725bcb3eb8049e2eb8e01a8e967f0af2d80cc21a194ae360f67a4b45:\n'
+--- actual repr:
+''

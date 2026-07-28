@@ -41,7 +41,11 @@ def main():
         print(f"Usage: {sys.argv[0]} <program_cmd>")
         sys.exit(1)
 
-    program_cmd = shlex.split(sys.argv[1])
+    # On Windows preserve backslashes in paths when splitting the program command
+    if os.name == 'nt':
+        program_cmd = sys.argv[1].split()
+    else:
+        program_cmd = shlex.split(sys.argv[1])
     input_dir = os.path.join(HERE, "input")
     output_dir = os.path.join(HERE, "output")
 

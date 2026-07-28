@@ -90,6 +90,7 @@ def main():
             break
 
         test_cases = batch["testCases"]
+        print("DEBUG test cases:", len(test_cases))
 
         result = subprocess.run(
             [sys.executable, tester_py, tool_cmd],
@@ -104,8 +105,10 @@ def main():
 
         try:
             results = json.loads(result.stdout)
+            print("DEBUG results:", len(results))
         except json.JSONDecodeError as e:
             print(f"  Failed to parse tester.py output: {e}", file=sys.stderr)
+            print('stdout repr:', repr(result.stdout), file=sys.stderr)
             sys.exit(1)
 
         file_hashes = {}

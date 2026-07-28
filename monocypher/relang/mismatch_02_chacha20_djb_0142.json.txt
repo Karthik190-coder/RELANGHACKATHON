@@ -1,0 +1,5 @@
+TEST: 02_chacha20_djb_0142
+--- expected repr:
+'805fe4fdb1a8ab1202f7ef7e45ea95a1e1331597b809e8ded471ea0f9977:\nfd670638f590e1bf:\n'
+--- actual repr:
+''

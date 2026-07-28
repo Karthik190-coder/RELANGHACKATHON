@@ -1,0 +1,5 @@
+TEST: 02_chacha20_djb_0041
+--- expected repr:
+'eec6:\nb141301f3002151d:\n'
+--- actual repr:
+''

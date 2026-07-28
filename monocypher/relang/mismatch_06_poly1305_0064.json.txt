@@ -1,0 +1,5 @@
+TEST: 06_poly1305_0064
+--- expected repr:
+'461625cc955c22696b3554c2da171060:\n'
+--- actual repr:
+''

@@ -1,0 +1,5 @@
+TEST: 16_eddsa_0157
+--- expected repr:
+'00:\n'
+--- actual repr:
+''

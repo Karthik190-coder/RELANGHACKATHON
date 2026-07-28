@@ -1,0 +1,5 @@
+TEST: e10_conversions_0006
+--- expected repr:
+'27538143e21a3b448c0b7e9e1f292b770656c0f03acbf7d1a1e23f1f5e10ec38:\n'
+--- actual repr:
+''

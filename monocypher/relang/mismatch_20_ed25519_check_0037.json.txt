@@ -1,0 +1,5 @@
+TEST: 20_ed25519_check_0037
+--- expected repr:
+'dab3f6ff2d958030d5cae756506a6cd0d1fd102423d8765878d0be077eafd4f9af4f4e30674a9d2d920f940c7def9409837c10bd93b1f6f7262dd1b78dcfab0d:\n'
+--- actual repr:
+''

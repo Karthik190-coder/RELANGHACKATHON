@@ -1,0 +1,5 @@
+TEST: e05_ed25519_roundtrip_0026
+--- expected repr:
+'00:\n'
+--- actual repr:
+'ff:\n'

@@ -1,0 +1,5 @@
+TEST: 04_xchacha20_0110
+--- expected repr:
+'0b80fb872f8ab633955cd18a99a8d91e34db14fafdfd9b89598abbd135981280525b6328cefc1b:\n90c15b861778fcd4:\n'
+--- actual repr:
+''

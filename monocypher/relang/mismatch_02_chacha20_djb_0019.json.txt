@@ -1,0 +1,5 @@
+TEST: 02_chacha20_djb_0019
+--- expected repr:
+':\n189b26c94a0787db:\n'
+--- actual repr:
+''
