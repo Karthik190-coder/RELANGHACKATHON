@@ -664,6 +664,10 @@ def ge_frombytes_neg_vartime(s):
     h.T = fe_neg(h.T)
     return h, 0
 
+BASE_POINT_BYTES = bytes.fromhex(
+    '5866666666666666666666666666666666666666666666666666666666666666'
+)
+
 def ge_cache(c, p):
     c.Yp = fe_add(p.Y, p.X)
     c.Ym = fe_sub(p.Y, p.X)
@@ -683,6 +687,35 @@ def ge_add(s, p, q):
     s.X = fe_mul(s.X, b)
     s.Y = fe_mul(s.Y, a)
     s.Z = fe_mul(a, b)
+
+def ge_frombytes_nonneg(s):
+    h, r = ge_frombytes_neg_vartime(s)
+    if r != 0:
+        return None, r
+    return h, 0
+
+def ge_scalarmult_base(scalar):
+    base_point, err = ge_frombytes_nonneg(BASE_POINT_BYTES)
+    if err != 0:
+        raise ValueError('invalid basepoint encoding')
+    cached_base = GE_CACHED()
+    ge_cache(cached_base, base_point)
+    result = ge_zero()
+    tmp = GE()
+    started = False
+    for i in range(255, -1, -1):
+        if started:
+            ge_double(result, result, tmp)
+        if scalar_bit(scalar, i):
+            if not started:
+                result.X = base_point.X[:]
+                result.Y = base_point.Y[:]
+                result.Z = base_point.Z[:]
+                result.T = base_point.T[:]
+                started = True
+            else:
+                ge_add(result, result, cached_base)
+    return result
 
 def ge_sub(s, p, q):
     neg = GE_CACHED(fe_copy(q.Ym), fe_copy(q.Yp), fe_copy(q.Z), fe_neg(q.T2))
@@ -868,28 +901,6 @@ def lookup_add(p, comb, scalar, i):
     b = [0]*10
     ge_madd(p, p, tmp_c, a, b)
 
-def ge_scalarmult_base(scalar):
-    half_mod_L = bytes([247,233,122,46,141,49,9,44,107,206,123,81,239,124,111,10,
-                        0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,8])
-    half_ones = bytes([142,74,204,70,186,24,118,107,184,231,190,57,250,173,119,99,
-                       255,255,255,255,255,255,255,255,255,255,255,255,255,255,255,7])
-    s_scalar = bytearray(32)
-    mul_add_into(s_scalar, scalar, half_mod_L, half_ones)
-    s_scalar = bytes(s_scalar)
-    p = ge_zero()
-    tmp_a = [0]*10
-    tmp_b = [0]*10
-    tmp_c = GE_PRECOMP(FE_ONE[:], FE_ONE[:], FE_ZERO[:])
-    tmp_d = GE()
-    lookup_add(p, B_WINDOW, s_scalar, 31)
-    lookup_add(p, B_COMB_HIGH, s_scalar, 31 + 128)
-    for i in range(30, -1, -1):
-        ge_double(p, p, tmp_d)
-        lookup_add(p, B_WINDOW, s_scalar, i)
-        lookup_add(p, B_COMB_HIGH, s_scalar, i + 128)
-    return p
-
-# ========================= SCALAR ARITHMETIC MOD L =========================
 
 L_WORDS = [0x5cf5d3ed, 0x5812631a, 0xa2f79cd6, 0x14def9de, 0, 0, 0, 0x10000000]
 L_BYTES = bytes([0xeb,0xd3,0xf5,0x5c,0x1a,0x63,0x12,0x58,
@@ -965,12 +976,21 @@ def mul_add_into(r, a, b, c):
         A[i] = load32_le(a[i*4:(i+1)*4])
         B[i] = load32_le(b[i*4:(i+1)*4])
     p = [0]*16
-    for i in range(8):
-        p[i] = load32_le(c[i*4:(i+1)*4])
     _mod_l_multiply(p, A, B)
+    carry = 0
+    for i in range(8):
+        carry += p[i] + load32_le(c[i*4:(i+1)*4])
+        p[i] = carry & 0xFFFFFFFF
+        carry >>= 32
+    i = 8
+    while carry and i < 16:
+        carry += p[i]
+        p[i] = carry & 0xFFFFFFFF
+        carry >>= 32
+        i += 1
     _mod_l(r, p)
 
-def crypto_eddsa_mul_add(r, a, b, c):
+def crypto_eddsa_mul_add(a, b, c):
     ra = bytearray(32)
     mul_add_into(ra, a, b, c)
     return bytes(ra)
@@ -1004,15 +1024,16 @@ def eddsa_key_pair(seed):
     return bytes(secret), public
 
 def eddsa_sign(secret_key, message):
-    a = blake2b_full(64, secret_key[:32])
-    a = crypto_eddsa_trim_scalar(a[:32])
-    prefix = a[32:64] if len(a) > 32 else bytes(32)
-    r = hash_reduce([secret_key[32:64] if len(secret_key) >= 64 else bytes(32), message])
+    # Correct EdDSA signing: use full 64-byte hash to get prefix, trim scalar from first 32
+    a_full = blake2b_full(64, secret_key[:32])
+    a_scalar = crypto_eddsa_trim_scalar(a_full[:32])
+    prefix = a_full[32:64]
+    r = hash_reduce([prefix, message])
     R = crypto_eddsa_scalarbase(r)
     h = hash_reduce([R, secret_key[32:64] if len(secret_key) >= 64 else bytes(32), message])
     sig = bytearray(64)
     sig[:32] = R
-    s_bytes = crypto_eddsa_mul_add(h, a[:32], r)
+    s_bytes = crypto_eddsa_mul_add(h, a_scalar, r)
     sig[32:] = s_bytes
     return bytes(sig)
 

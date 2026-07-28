@@ -2,4 +2,4 @@ TEST: 16_eddsa_0217
 --- expected repr:
 'ca361ae4452b5b4dc1fa722620ae249e52532bcd4ba3dc00f757a7e444d0c809:\n'
 --- actual repr:
-''
+'b3a15c7c6325c92aa6fada080557c0a8f8114f33cfc5d03356b8a2c82811450d:\n'
