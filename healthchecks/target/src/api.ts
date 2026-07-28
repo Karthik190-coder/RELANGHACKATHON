@@ -1,4 +1,4 @@
-import { Router, Response } from "express";
+import { Router, Request, Response } from "express";
 import { v4 as uuidv4 } from "uuid";
 import parser from "cron-parser";
 import { db } from "./db";
@@ -7,6 +7,16 @@ import { CheckRow, checkToDict, goingDownAfter, getUniqueKey } from "./check_mod
 import { legacyTimezones, allTimezones } from "./tz";
 
 const router = Router();
+
+// Validate that JSON request bodies are objects
+router.use((req, res, next) => {
+  if (req.method === "POST" && req.headers["content-type"]?.includes("json")) {
+    if (req.body !== undefined && req.body !== null && (typeof req.body !== "object" || Array.isArray(req.body))) {
+      return res.status(400).json({ error: "json validation error: value is not an object" });
+    }
+  }
+  next();
+});
 
 function slugify(text: string): string {
   return text
@@ -79,7 +89,7 @@ function validateSpec(body: any): string | null {
   if (body.schedule !== undefined) {
     if (typeof body.schedule !== "string") return "json validation error: schedule is not a string";
     if (body.schedule.length > 100) return "json validation error: schedule is too long";
-    
+
     const parts = body.schedule.trim().split(/\s+/);
     if (parts.length === 5) {
       try {
@@ -216,7 +226,7 @@ function updateCheckFromSpec(check: CheckRow, body: any, v: number): CheckRow {
   );
 
   // Channels M2M update
-  if (body.channels !== undefined) {
+  if (body.channels !== undefined && body.channels !== null) {
     db.prepare("DELETE FROM api_channel_checks WHERE check_id = ?").run(check.id);
     if (body.channels === "*") {
       const pChannels = db.prepare("SELECT id FROM channels WHERE project_id = ?").all(check.project_id) as any[];
@@ -224,8 +234,13 @@ function updateCheckFromSpec(check: CheckRow, body: any, v: number): CheckRow {
         db.prepare("INSERT INTO api_channel_checks (channel_id, check_id) VALUES (?, ?)").run(ch.id, check.id);
       }
     } else if (body.channels !== "") {
+      let chIds: string[] = [];
+      if (Array.isArray(body.channels)) {
+        chIds = body.channels.map(String);
+      } else if (typeof body.channels === "string") {
+        chIds = body.channels.split(",");
+      }
       const pChannels = db.prepare("SELECT * FROM channels WHERE project_id = ?").all(check.project_id) as any[];
-      const chIds = body.channels.split(",");
       for (const chIdStr of chIds) {
         const ch = pChannels.find(c => c.code === chIdStr || c.name === chIdStr);
         if (ch) {
@@ -238,10 +253,36 @@ function updateCheckFromSpec(check: CheckRow, body: any, v: number): CheckRow {
   return db.prepare("SELECT * FROM checks WHERE id = ?").get(check.id) as CheckRow;
 }
 
+function getReqSiteRoot(req: Request): string {
+  return `${req.protocol}://${req.get("host")}`;
+}
+
 // Router endpoints definition
 const apiPaths = ["/api/v1", "/api/v2", "/api/v3"];
 
 for (const prefix of apiPaths) {
+  // CORS & Method checks for checks list
+  router.all(`${prefix}/checks/`, (req: AuthenticatedRequest, res: Response, next) => {
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Headers", "X-Api-Key");
+    res.setHeader("Access-Control-Allow-Methods", "OPTIONS, POST, GET");
+    res.setHeader("Access-Control-Max-Age", "600");
+    if (req.method === "OPTIONS") {
+      res.writeHead(204, {
+        "Content-Type": "text/html",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Headers": "X-Api-Key",
+        "Access-Control-Allow-Methods": "OPTIONS, POST, GET",
+        "Access-Control-Max-Age": "600"
+      });
+      return res.end();
+    }
+    if (req.method !== "GET" && req.method !== "POST") {
+      return res.status(405).send("Method Not Allowed");
+    }
+    next();
+  });
+
   // GET checks list
   router.get(`${prefix}/checks/`, authorizeApiRead, (req: AuthenticatedRequest, res: Response) => {
     const project = req.project!;
@@ -262,7 +303,7 @@ for (const prefix of apiPaths) {
       checks = checks.filter(c => c.slug === slug);
     }
 
-    const checksJson = checks.map(c => checkToDict(c, req.readonly, req.v));
+    const checksJson = checks.map(c => checkToDict(c, req.readonly, req.v, getReqSiteRoot(req)));
     res.json({ checks: checksJson });
   });
 
@@ -292,7 +333,7 @@ for (const prefix of apiPaths) {
 
     if (existingCheck) {
       const updated = updateCheckFromSpec(existingCheck, body, req.v!);
-      return res.status(200).json(checkToDict(updated, req.readonly, req.v));
+      return res.status(200).json(checkToDict(updated, req.readonly, req.v, getReqSiteRoot(req)));
     }
 
     // Create new check
@@ -315,7 +356,40 @@ for (const prefix of apiPaths) {
     const check = db.prepare("SELECT * FROM checks WHERE code = ?").get(newCode) as CheckRow;
     const updated = updateCheckFromSpec(check, body, req.v!);
 
-    res.status(201).json(checkToDict(updated, req.readonly, req.v));
+    res.status(201).json(checkToDict(updated, req.readonly, req.v, getReqSiteRoot(req)));
+  });
+
+  // CORS & Method checks for single check
+  router.options(`${prefix}/checks/:code`, (req: Request, res: Response) => {
+    res.writeHead(204, {
+      "Content-Type": "text/html",
+      "Access-Control-Allow-Origin": "*",
+      "Access-Control-Allow-Headers": "X-Api-Key",
+      "Access-Control-Allow-Methods": "DELETE, POST, GET, OPTIONS",
+      "Access-Control-Max-Age": "600"
+    });
+    return res.end();
+  });
+
+  router.all(`${prefix}/checks/:code`, (req: AuthenticatedRequest, res: Response, next) => {
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Headers", "X-Api-Key");
+    res.setHeader("Access-Control-Allow-Methods", "DELETE, POST, GET, OPTIONS");
+    res.setHeader("Access-Control-Max-Age", "600");
+    if (req.method === "OPTIONS") {
+      res.writeHead(204, {
+        "Content-Type": "text/html",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Headers": "X-Api-Key",
+        "Access-Control-Allow-Methods": "DELETE, POST, GET, OPTIONS",
+        "Access-Control-Max-Age": "600"
+      });
+      return res.end();
+    }
+    if (req.method !== "GET" && req.method !== "POST" && req.method !== "DELETE") {
+      return res.status(405).send("Method Not Allowed");
+    }
+    next();
   });
 
   // GET single check
@@ -325,7 +399,7 @@ for (const prefix of apiPaths) {
     if (!check) {
       return res.status(404).send("Not Found");
     }
-    res.json(checkToDict(check, req.readonly, req.v));
+    res.json(checkToDict(check, req.readonly, req.v, getReqSiteRoot(req)));
   });
 
   // POST update single check
@@ -342,7 +416,7 @@ for (const prefix of apiPaths) {
     }
 
     const updated = updateCheckFromSpec(check, req.body, req.v!);
-    res.json(checkToDict(updated, req.readonly, req.v));
+    res.json(checkToDict(updated, req.readonly, req.v, getReqSiteRoot(req)));
   });
 
   // DELETE single check
@@ -354,7 +428,7 @@ for (const prefix of apiPaths) {
     }
 
     db.prepare("DELETE FROM checks WHERE id = ?").run(check.id);
-    res.json(checkToDict(check, req.readonly, req.v));
+    res.json(checkToDict(check, req.readonly, req.v, getReqSiteRoot(req)));
   });
 
   // POST pause single check
@@ -366,14 +440,14 @@ for (const prefix of apiPaths) {
     }
 
     if (check.status === "paused") {
-      return res.json(checkToDict(check, req.readonly, req.v));
+      return res.json(checkToDict(check, req.readonly, req.v, getReqSiteRoot(req)));
     }
 
     db.prepare("UPDATE checks SET status = 'paused', last_start = NULL, alert_after = NULL WHERE id = ?")
       .run(check.id);
 
     const updated = db.prepare("SELECT * FROM checks WHERE id = ?").get(check.id) as CheckRow;
-    res.json(checkToDict(updated, req.readonly, req.v));
+    res.json(checkToDict(updated, req.readonly, req.v, getReqSiteRoot(req)));
   });
 
   // POST resume single check
@@ -392,7 +466,30 @@ for (const prefix of apiPaths) {
       .run(check.id);
 
     const updated = db.prepare("SELECT * FROM checks WHERE id = ?").get(check.id) as CheckRow;
-    res.json(checkToDict(updated, req.readonly, req.v));
+    res.json(checkToDict(updated, req.readonly, req.v, getReqSiteRoot(req)));
+  });
+
+  // GET badges
+  router.get([`${prefix}/badges/`, `${prefix}/badges`], authorizeApiRead, (req: AuthenticatedRequest, res: Response) => {
+    const key = req.project!.badge_key;
+    const siteRoot = getReqSiteRoot(req);
+    const badges: any = {
+      "*": {
+        svg: `${siteRoot}/badge/${key}/sig/*.svg`,
+        svg3: `${siteRoot}/badge/${key}/sig/*.svg`,
+        json: `${siteRoot}/badge/${key}/sig/*.json`,
+        json3: `${siteRoot}/badge/${key}/sig/*.json`,
+        shields: `${siteRoot}/badge/${key}/sig/*.shields`,
+        shields3: `${siteRoot}/badge/${key}/sig/*.shields`
+      }
+    };
+    res.json({ badges });
+  });
+
+  // POST bounces
+  router.post([`${prefix}/bounces/`, `${prefix}/bounces`], (req: Request, res: Response) => {
+    res.setHeader("Content-Type", "text/html");
+    res.status(200).send("OK (bad signature)");
   });
 
   // GET channels list
@@ -426,8 +523,8 @@ for (const prefix of apiPaths) {
         method: p.method,
         ua: p.ua,
         rid: null,
-        body_url: p.body ? `${process.env.SITE_ROOT || "http://localhost:8000"}/api/v${req.v}/checks/${check.code}/pings/${p.n}/body` : null,
-        duration: null // simple mock duration
+        body_url: p.body ? `${getReqSiteRoot(req)}/api/v${req.v}/checks/${check.code}/pings/${p.n}/body` : null,
+        duration: null
       }))
     });
   });
@@ -440,8 +537,9 @@ for (const prefix of apiPaths) {
       return res.status(404).send("Not Found");
     }
 
-    const ping = db.prepare("SELECT * FROM pings WHERE check_id = ? AND n = ?").get(check.id, req.params.n) as any;
-    if (!ping || !ping.body) {
+    const pingNumber = parseInt(req.params.n, 10);
+    const ping = db.prepare("SELECT * FROM pings WHERE check_id = ? AND n = ?").get(check.id, pingNumber) as any;
+    if (!ping || ping.body === null || ping.body === undefined) {
       return res.status(404).send("Not Found");
     }
 

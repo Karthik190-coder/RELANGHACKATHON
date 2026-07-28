@@ -1,4 +1,4 @@
-import { Router, Request, Response } from "express";
+import express, { Router, Request, Response } from "express";
 import { db } from "./db";
 import { CheckRow, goingDownAfter, getStatus } from "./check_model";
 
@@ -28,10 +28,10 @@ export function processPing(
   let remoteAddr = (req.headers["x-forwarded-for"] as string) || req.socket.remoteAddress || "127.0.0.1";
   remoteAddr = remoteAddr.split(",")[0].trim();
 
-  const scheme = (req.headers["x-forwarded-proto"] as string) || req.protocol;
+  const scheme = (req.headers["x-forwarded-proto"] as string) || req.protocol || "http";
   const method = req.method;
-  const ua = (req.headers["user-agent"] as string) || "";
-  
+  const ua = ((req.headers["user-agent"] as string) || "").slice(0, 200);
+
   // Truncate User-Agent to 200 chars
   const truncatedUa = ua.slice(0, 200);
 
@@ -42,7 +42,7 @@ export function processPing(
       bodyText = req.body;
     } else if (Buffer.isBuffer(req.body)) {
       bodyText = req.body.toString("utf8");
-    } else {
+    } else if (typeof req.body === "object" && Object.keys(req.body).length > 0) {
       bodyText = JSON.stringify(req.body);
     }
   }
@@ -71,12 +71,20 @@ export function processPing(
     }
   }
 
-  const rid = req.query.rid as string || null;
+  const ridStr = req.query.rid as string | undefined;
+  let rid: string | null = null;
+  if (ridStr !== undefined && ridStr !== "") {
+    const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
+    if (!uuidRegex.test(ridStr)) {
+      return { status: 400, text: "invalid uuid format" };
+    }
+    rid = ridStr;
+  }
 
   db.transaction(() => {
     // Reload check for update lock
     const currentCheck = db.prepare("SELECT * FROM checks WHERE id = ?").get(check.id) as CheckRow;
-    
+
     let lastStart = currentCheck.last_start;
     let lastDuration = currentCheck.last_duration;
     let status = currentCheck.status;
@@ -84,6 +92,10 @@ export function processPing(
     let lastStartRid = currentCheck.last_start_rid;
 
     const frozenNow = new Date().toISOString();
+
+    if (currentCheck.methods === "POST" && req.method !== "POST") {
+      action = "ign";
+    }
 
     if (currentCheck.status === "paused" && currentCheck.manual_resume === 1) {
       action = "ign";
@@ -172,7 +184,8 @@ export function processPing(
 const handlePingByCode = (req: Request, res: Response, actionOverride?: string) => {
   const { code } = req.params;
   const action = actionOverride || "success";
-  
+  console.log("PING CODE:", code, "HEADERS:", req.headers, "BODY:", req.body);
+
   // If there's an exit status in param (or if it parses as number)
   let exitstatus: number | null = null;
   if (req.params.exitstatus !== undefined) {
@@ -190,12 +203,13 @@ const handlePingByCode = (req: Request, res: Response, actionOverride?: string) 
   res.status(result.status).send(result.text);
 };
 
-router.post("/ping/:code", (req, res) => handlePingByCode(req, res));
-router.head("/ping/:code", (req, res) => handlePingByCode(req, res));
-router.post("/ping/:code/fail", (req, res) => handlePingByCode(req, res, "fail"));
-router.post("/ping/:code/start", (req, res) => handlePingByCode(req, res, "start"));
-router.post("/ping/:code/log", (req, res) => handlePingByCode(req, res, "log"));
-router.post("/ping/:code/:exitstatus(\\d+)", (req, res) => handlePingByCode(req, res));
+const textParser = express.text({ type: "*/*" });
+
+router.all("/ping/:code", textParser, (req, res) => handlePingByCode(req, res));
+router.all("/ping/:code/fail", textParser, (req, res) => handlePingByCode(req, res, "fail"));
+router.all("/ping/:code/start", textParser, (req, res) => handlePingByCode(req, res, "start"));
+router.all("/ping/:code/log", textParser, (req, res) => handlePingByCode(req, res, "log"));
+router.all("/ping/:code/:exitstatus(\\d+)", textParser, (req, res) => handlePingByCode(req, res));
 
 // Endpoints by Ping Key and Slug
 const handlePingBySlug = (req: Request, res: Response, actionOverride?: string) => {
@@ -252,7 +266,7 @@ const handlePingBySlug = (req: Request, res: Response, actionOverride?: string) 
   const result = processPing(check, req, action, exitstatus);
   res.setHeader("Ping-Body-Limit", "10000");
   res.setHeader("Access-Control-Allow-Origin", "*");
-  
+
   let responseText = result.text;
   let responseStatus = result.status;
   if (responseStatus === 200 && created) {
@@ -262,10 +276,10 @@ const handlePingBySlug = (req: Request, res: Response, actionOverride?: string) 
   res.status(responseStatus).send(responseText);
 };
 
-router.post("/ping/:ping_key/:slug", (req, res) => handlePingBySlug(req, res));
-router.post("/ping/:ping_key/:slug/fail", (req, res) => handlePingBySlug(req, res, "fail"));
-router.post("/ping/:ping_key/:slug/start", (req, res) => handlePingBySlug(req, res, "start"));
-router.post("/ping/:ping_key/:slug/log", (req, res) => handlePingBySlug(req, res, "log"));
-router.post("/ping/:ping_key/:slug/:exitstatus(\\d+)", (req, res) => handlePingBySlug(req, res));
+router.all("/ping/:ping_key/:slug", textParser, (req, res) => handlePingBySlug(req, res));
+router.all("/ping/:ping_key/:slug/fail", textParser, (req, res) => handlePingBySlug(req, res, "fail"));
+router.all("/ping/:ping_key/:slug/start", textParser, (req, res) => handlePingBySlug(req, res, "start"));
+router.all("/ping/:ping_key/:slug/log", textParser, (req, res) => handlePingBySlug(req, res, "log"));
+router.all("/ping/:ping_key/:slug/:exitstatus(\\d+)", textParser, (req, res) => handlePingBySlug(req, res));
 
 export default router;

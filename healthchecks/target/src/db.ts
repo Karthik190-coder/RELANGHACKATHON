@@ -134,6 +134,9 @@ db.exec(`
   );
 `);
 
+try { db.exec("ALTER TABLE checks ADD COLUMN last_start_rid TEXT"); } catch (e) {}
+try { db.exec("ALTER TABLE checks ADD COLUMN has_confirmation_link INTEGER DEFAULT 0"); } catch (e) {}
+
 export function resetDatabase() {
   db.transaction(() => {
     // Delete target data
@@ -144,12 +147,12 @@ export function resetDatabase() {
     db.prepare("DELETE FROM checks").run();
     db.prepare("DELETE FROM sessions").run();
 
-    // Remove users other than alice, bob, charlie
-    db.prepare("DELETE FROM users WHERE username NOT IN ('alice', 'bob', 'charlie')").run();
+    // Remove all users to ensure fresh seeding on reset
+    db.prepare("DELETE FROM users").run();
 
     // Ensure alice, bob, charlie exist
     const insertUser = db.prepare(`
-      INSERT OR IGNORE INTO users (username, email, password)
+      INSERT INTO users (username, email, password)
       VALUES (?, ?, ?)
     `);
     

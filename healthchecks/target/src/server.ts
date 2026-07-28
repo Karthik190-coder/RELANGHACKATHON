@@ -11,8 +11,25 @@ const port = process.env.PORT || 8000;
 
 // Body & cookie parsing middlewares
 app.use(cookieParser());
-app.use(express.urlencoded({ extended: true }));
-app.use(express.json());
+app.use((req, res, next) => {
+  if (req.path.startsWith("/ping/")) {
+    return next();
+  }
+  express.urlencoded({ extended: true })(req, res, (err) => {
+    if (err) return next(err);
+    express.json()(req, res, (err2) => {
+      if (err2) {
+        if (err2 instanceof SyntaxError && "status" in err2 && (err2 as any).status === 400 && "body" in err2) {
+          if (req.path.startsWith("/api/")) {
+            return res.status(400).json({ error: "could not parse request body" });
+          }
+        }
+        return next(err2);
+      }
+      next();
+    });
+  });
+});
 
 // Session authentication and CSRF middlewares
 app.use(sessionAuth);

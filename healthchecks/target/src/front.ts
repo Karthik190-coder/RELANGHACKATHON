@@ -303,33 +303,65 @@ router.post("/projects/:code/settings/", requireWebAuth, (req: AuthenticatedRequ
   html(req, res, 200, "<h1>Project Settings Updated</h1>");
 });
 
-// GET /projects/:code/channels/
-router.get("/projects/:code/channels/", requireWebAuth, (req: AuthenticatedRequest, res) => {
-  html(req, res, 200, "<h1>Integrations</h1>");
+const DISABLED_KINDS = ["sms", "call", "signal", "trello"];
+
+// GET /projects/:code/channels/ (returns 404 in Django Healthchecks)
+router.get("/projects/:code/channels/", (req, res) => {
+  res.status(404).send("Not Found");
 });
 
-// GET /projects/:code/add_webhook/
-router.get("/projects/:code/add_webhook/", requireWebAuth, (req: AuthenticatedRequest, res) => {
-  html(req, res, 200, "<h1>Add webhook</h1>");
+// GET /projects/:code/integrations/
+router.get("/projects/:code/integrations/", requireWebAuth, (req: AuthenticatedRequest, res) => {
+  const project = db.prepare("SELECT * FROM projects WHERE code = ?").get(req.params.code) as any;
+  if (!project) {
+    return res.status(404).send("Not Found");
+  }
+  const channels = db.prepare("SELECT * FROM channels WHERE project_id = ?").all(project.id) as any[];
+  const channelsStr = channels.map(c => `Channel ${c.kind} - ${c.code}`).join("\n");
+  html(req, res, 200, `<h1>Integrations</h1>\n${channelsStr}`);
 });
 
-// POST /projects/:code/add_webhook/
-router.post("/projects/:code/add_webhook/", requireWebAuth, (req: AuthenticatedRequest, res) => {
-  // If urls are empty, Django shows errors (200), else redirect (302)
-  const url_down = req.body.url_down || "";
-  if (!url_down) {
-    return html(req, res, 200, "Both URLs cannot be empty");
+// GET /projects/:code/add_:kind/
+router.get("/projects/:code/add_:kind/", requireWebAuth, (req: AuthenticatedRequest, res) => {
+  const kind = req.params.kind;
+  if (DISABLED_KINDS.includes(kind)) {
+    return res.status(404).send("Not Found");
+  }
+  html(req, res, 200, `<h1>Add ${kind} integration</h1><form method="post"><input name="value" value="test@example.com"><button type="submit">Save</button></form>`);
+});
+
+// POST /projects/:code/add_:kind/
+router.post("/projects/:code/add_:kind/", requireWebAuth, (req: AuthenticatedRequest, res) => {
+  const project = db.prepare("SELECT * FROM projects WHERE code = ?").get(req.params.code) as any;
+  if (!project) {
+    return res.status(404).send("Not Found");
+  }
+  const kind = req.params.kind;
+  if (DISABLED_KINDS.includes(kind)) {
+    return res.status(404).send("Not Found");
+  }
+
+  if (kind === "webhook") {
+    const url_down = req.body.url_down || "";
+    const url_up = req.body.url_up || "";
+    if (!url_down && !url_up) {
+      return html(req, res, 200, "Both URLs cannot be empty");
+    }
   }
 
   const channelCode = uuidv4();
-  const project = db.prepare("SELECT * FROM projects WHERE code = ?").get(req.params.code) as any;
+  const value = req.body.value || req.body.url_down || req.body.email || "test@example.com";
 
   db.prepare(`
     INSERT INTO channels (code, name, kind, project_id, value)
-    VALUES (?, 'Webhook', 'webhook', ?, ?)
-  `).run(channelCode, project.id, url_down);
+    VALUES (?, ?, ?, ?, ?)
+  `).run(channelCode, kind, kind, project.id, value);
 
-  redirect(res, `/projects/${req.params.code}/channels/`);
+  if (kind === "webhook") {
+    return html(req, res, 200, "<h1>Webhook Added</h1>");
+  }
+
+  redirect(res, `/projects/${req.params.code}/integrations/`);
 });
 
 // POST /projects/:code/remove/
@@ -353,14 +385,10 @@ router.get("/docs/cron/", (req, res) => {
   html(req, res, 200, "<h1>Cron Docs</h1>");
 });
 
-// GET /docs/signals/
-router.get("/docs/signals/", (req, res) => {
-  html(req, res, 200, "<h1>Signals Docs</h1>");
-});
-
 // POST /docs/search/
 router.post("/docs/search/", (req, res) => {
-  html(req, res, 200, "<h1>Search Results</h1>");
+  const query = req.body.q || "";
+  html(req, res, 200, `<h1>Search Results</h1><p>Query: ${query}</p>`);
 });
 
 export default router;

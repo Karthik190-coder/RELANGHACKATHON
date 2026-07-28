@@ -129,9 +129,9 @@ export function getChannelsStr(checkId: number): string {
   return rows.map(r => r.code).sort().join(",");
 }
 
-export function checkToDict(check: CheckRow, readonly: boolean = false, v: number = 3): any {
+export function checkToDict(check: CheckRow, readonly: boolean = false, v: number = 3, customSiteRoot?: string): any {
   const withStarted = v === 1;
-  const siteRoot = process.env.SITE_ROOT || "http://localhost:8000";
+  const siteRoot = customSiteRoot || process.env.SITE_ROOT || "http://localhost:8000";
 
   const result: any = {
     name: check.name,

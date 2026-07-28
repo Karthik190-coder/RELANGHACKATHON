@@ -15,6 +15,7 @@ export interface AuthenticatedRequest extends Request {
     api_key: string;
     api_key_readonly: string;
     ping_key: string;
+    badge_key: string;
     show_slugs: number;
   };
   readonly?: boolean;
@@ -53,8 +54,8 @@ export function sessionAuth(req: AuthenticatedRequest, res: Response, next: Next
 // CSRF checking middleware for HTML forms
 export function csrfCheck(req: Request, res: Response, next: NextFunction) {
   const path = req.path;
-  // Exempt API, ping, and test endpoints from CSRF checks
-  if (path.startsWith("/api/") || path.startsWith("/ping/") || path.startsWith("/__test/")) {
+  // Exempt API, ping, test, and docs endpoints from CSRF checks
+  if (path.startsWith("/api/") || path.startsWith("/ping/") || path.startsWith("/__test/") || path.startsWith("/docs/")) {
     return next();
   }
 
@@ -86,12 +87,12 @@ export function requireWebAuth(req: AuthenticatedRequest, res: Response, next: N
 
 // Middleware to authorize read-write API requests
 export function authorizeApi(req: AuthenticatedRequest, res: Response, next: NextFunction) {
-  let apiKey = req.headers["x-api-key"] || req.body.api_key;
+  let apiKey = req.headers["x-api-key"] || (req.body && typeof req.body === "object" ? req.body.api_key : undefined);
   if (Array.isArray(apiKey)) {
     apiKey = apiKey[0];
   }
 
-  if (!apiKey || apiKey.length !== 32) {
+  if (!apiKey || typeof apiKey !== "string" || apiKey.length !== 32) {
     return res.status(401).json({ error: "missing api key" });
   }
 
@@ -108,12 +109,12 @@ export function authorizeApi(req: AuthenticatedRequest, res: Response, next: Nex
 
 // Middleware to authorize read-only/read-write API requests
 export function authorizeApiRead(req: AuthenticatedRequest, res: Response, next: NextFunction) {
-  let apiKey = req.headers["x-api-key"] || req.body.api_key;
+  let apiKey = req.headers["x-api-key"];
   if (Array.isArray(apiKey)) {
     apiKey = apiKey[0];
   }
 
-  if (!apiKey || apiKey.length !== 32) {
+  if (!apiKey || typeof apiKey !== "string" || apiKey.length !== 32) {
     return res.status(401).json({ error: "missing api key" });
   }
 
@@ -123,7 +124,7 @@ export function authorizeApiRead(req: AuthenticatedRequest, res: Response, next:
   }
 
   req.project = project;
-  req.readonly = apiKey === project.api_key_readonly;
+  req.readonly = apiKey.startsWith("hcr_") || apiKey === project.api_key_readonly;
   req.v = req.path.startsWith("/api/v3/") ? 3 : req.path.startsWith("/api/v2/") ? 2 : 1;
   next();
 }
