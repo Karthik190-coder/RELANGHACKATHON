@@ -308,7 +308,12 @@ class Lexer {
       return this.makeToken(TokenType.TOKEN_FIELD);
     }
 
-    const type = KEYWORDS[text] || TokenType.TOKEN_NAME;
+    // Keywords must be explicit table entries. A plain-object lookup turns
+    // identifiers such as `toString` into inherited JavaScript properties,
+    // which corrupts otherwise valid Wren member expressions.
+    const type = Object.prototype.hasOwnProperty.call(KEYWORDS, text)
+      ? KEYWORDS[text]
+      : TokenType.TOKEN_NAME;
     return this.makeToken(type);
   }
 
