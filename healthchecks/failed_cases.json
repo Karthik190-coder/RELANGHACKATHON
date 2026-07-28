@@ -1,0 +1,1146 @@
+[
+  {
+    "id": "front_get_docs_search_returns_200",
+    "test_case": {
+      "id": "front_get_docs_search_returns_200",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"GET\",\"path\":\"/docs/search/\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 404, \"step\": 1}]"
+  },
+  {
+    "id": "accounts_post_signup_without_password_field_returns_error",
+    "test_case": {
+      "id": "accounts_post_signup_without_password_field_returns_error",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"GET\",\"path\":\"/accounts/signup/csrf/\"},\"expected\":{\"status\":200},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/accounts/signup/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"identity=newuser%40example.org&csrfmiddlewaretoken={csrfToken}\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 200, \"step\": 1}, {\"content-type\": \"text/html\", \"status\": 302, \"step\": 2}]"
+  },
+  {
+    "id": "api_get_ping_body_when_no_body_stored",
+    "test_case": {
+      "id": "api_get_ping_body_when_no_body_stored",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"POST\",\"path\":\"/api/v1/checks/\",\"headers\":{\"content-type\":\"application/json\",\"x-api-key\":\"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\"},\"body\":\"{\\\"name\\\":\\\"No Body\\\",\\\"timeout\\\":3600,\\\"grace\\\":60}\"},\"expected\":{\"status\":201},\"storeCookies\":{},\"store\":{\"noBdyId\":\"$.uuid\"},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/ping/{noBdyId}\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"GET\",\"path\":\"/api/v1/checks/{noBdyId}/pings/1/body\",\"headers\":{\"x-api-key\":\"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\"}},\"expected\":{\"status\":404},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"body\": \"{\\\"badge_url\\\": \\\"http://localhost:8011/b/2/<UUID>.svg\\\", \\\"channels\\\": \\\"\\\", \\\"desc\\\": \\\"\\\", \\\"failure_kw\\\": \\\"\\\", \\\"filter_body\\\": false, \\\"filter_default_fail\\\": false, \\\"filter_http_body\\\": false, \\\"filter_subject\\\": false, \\\"grace\\\": 60, \\\"last_ping\\\": null, \\\"manual_resume\\\": false, \\\"methods\\\": \\\"\\\", \\\"n_pings\\\": 0, \\\"name\\\": \\\"No Body\\\", \\\"next_ping\\\": null, \\\"pause_url\\\": \\\"http://localhost:8011/api/v1/checks/<UUID>/pause\\\", \\\"ping_url\\\": \\\"http://localhost:8011/ping/<UUID>\\\", \\\"resume_url\\\": \\\"http://localhost:8011/api/v1/checks/<UUID>/resume\\\", \\\"slug\\\": \\\"no-body\\\", \\\"start_kw\\\": \\\"\\\", \\\"started\\\": false, \\\"status\\\": \\\"new\\\", \\\"subject\\\": \\\"\\\", \\\"subject_fail\\\": \\\"\\\", \\\"success_kw\\\": \\\"\\\", \\\"tags\\\": \\\"\\\", \\\"timeout\\\": 3600, \\\"update_url\\\": \\\"http://localhost:8011/api/v1/checks/<UUID>\\\", \\\"uuid\\\": \\\"<UUID>\\\"}\", \"content-type\": \"application/json\", \"status\": 201, \"step\": 1}, {\"content-type\": \"text/html\", \"status\": 200, \"step\": 2}, {\"body\": \"\", \"content-type\": \"text/plain\", \"status\": 200, \"step\": 3}]"
+  },
+  {
+    "id": "accounts_get_notifications_when_logged_in_returns_200",
+    "test_case": {
+      "id": "accounts_get_notifications_when_logged_in_returns_200",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"GET\",\"path\":\"/accounts/login/\"},\"expected\":{\"status\":200},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/accounts/login/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"action=login&email=alice@example.org&password=password&csrfmiddlewaretoken={csrfToken}\"},\"expected\":{\"status\":302},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"GET\",\"path\":\"/accounts/profile/notifications/\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 200, \"step\": 1}, {\"content-type\": \"text/html\", \"status\": 302, \"step\": 2}, {\"content-type\": \"text/html\", \"status\": 404, \"step\": 3}]"
+  },
+  {
+    "id": "api_create_with_null_manual_resume_returns_400",
+    "test_case": {
+      "id": "api_create_with_null_manual_resume_returns_400",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"POST\",\"path\":\"/api/v1/checks/\",\"headers\":{\"content-type\":\"application/json\",\"x-api-key\":\"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\"},\"body\":\"{\\\"name\\\":\\\"Test\\\",\\\"timeout\\\":3600,\\\"grace\\\":60,\\\"manual_resume\\\":null}\"},\"expected\":{\"status\":400},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"body\": \"{\\\"badge_url\\\": \\\"http://localhost:8011/b/2/<UUID>.svg\\\", \\\"channels\\\": \\\"\\\", \\\"desc\\\": \\\"\\\", \\\"failure_kw\\\": \\\"\\\", \\\"filter_body\\\": false, \\\"filter_default_fail\\\": false, \\\"filter_http_body\\\": false, \\\"filter_subject\\\": false, \\\"grace\\\": 60, \\\"last_ping\\\": null, \\\"manual_resume\\\": false, \\\"methods\\\": \\\"\\\", \\\"n_pings\\\": 0, \\\"name\\\": \\\"Test\\\", \\\"next_ping\\\": null, \\\"pause_url\\\": \\\"http://localhost:8011/api/v1/checks/<UUID>/pause\\\", \\\"ping_url\\\": \\\"http://localhost:8011/ping/<UUID>\\\", \\\"resume_url\\\": \\\"http://localhost:8011/api/v1/checks/<UUID>/resume\\\", \\\"slug\\\": \\\"test\\\", \\\"start_kw\\\": \\\"\\\", \\\"started\\\": false, \\\"status\\\": \\\"new\\\", \\\"subject\\\": \\\"\\\", \\\"subject_fail\\\": \\\"\\\", \\\"success_kw\\\": \\\"\\\", \\\"tags\\\": \\\"\\\", \\\"timeout\\\": 3600, \\\"update_url\\\": \\\"http://localhost:8011/api/v1/checks/<UUID>\\\", \\\"uuid\\\": \\\"<UUID>\\\"}\", \"content-type\": \"application/json\", \"status\": 201, \"step\": 1}]"
+  },
+  {
+    "id": "api_post_notification_status_with_undelivered_works",
+    "test_case": {
+      "id": "api_post_notification_status_with_undelivered_works",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"POST\",\"path\":\"/api/v1/notifications/00000000-0000-0000-0000-000000000000/status\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"MessageStatus=undelivered\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 404, \"step\": 1}]"
+  },
+  {
+    "id": "api_create_check_with_non_dict_json_returns_400_2",
+    "test_case": {
+      "id": "api_create_check_with_non_dict_json_returns_400_2",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"POST\",\"path\":\"/api/v1/checks/\",\"headers\":{\"content-type\":\"application/json\",\"x-api-key\":\"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\"},\"body\":\"42\"},\"expected\":{\"status\":400},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"body\": \"{\\\"error\\\": \\\"could not parse request body\\\"}\", \"content-type\": \"application/json\", \"status\": 400, \"step\": 1}]"
+  },
+  {
+    "id": "integrations_add_page_returns_404_when_disabled_8",
+    "test_case": {
+      "id": "integrations_add_page_returns_404_when_disabled_8",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"GET\",\"path\":\"/accounts/login/\"},\"expected\":{\"status\":200},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/accounts/login/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"action=login&email=alice@example.org&password=password&csrfmiddlewaretoken={csrfToken}\"},\"expected\":{\"status\":302},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"GET\",\"path\":\"/\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{\"projectCode\":\"/projects/([0-9a-f-]{36})/\"}},{\"request\":{\"method\":\"GET\",\"path\":\"/projects/{projectCode}/add_shell/\"},\"expected\":{\"status\":404},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 200, \"step\": 1}, {\"content-type\": \"text/html\", \"status\": 302, \"step\": 2}, {\"content-type\": \"text/html\", \"status\": 200, \"step\": 3}, {\"content-type\": \"text/html\", \"status\": 200, \"step\": 4}]"
+  },
+  {
+    "id": "accounts_post_add_totp_with_non_digit_code_shows_error",
+    "test_case": {
+      "id": "accounts_post_add_totp_with_non_digit_code_shows_error",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"GET\",\"path\":\"/accounts/login/\"},\"expected\":{\"status\":200},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/accounts/login/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"action=login&email=alice@example.org&password=password&csrfmiddlewaretoken={csrfToken}\"},\"expected\":{\"status\":302},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"GET\",\"path\":\"/accounts/two_factor/totp/\"},\"expected\":{\"status\":200},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/accounts/two_factor/totp/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"code=abc123&csrfmiddlewaretoken={csrfToken}\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 200, \"step\": 1}, {\"content-type\": \"text/html\", \"status\": 302, \"step\": 2}, {\"content-type\": \"text/html\", \"status\": 404, \"step\": 3}, {\"content-type\": \"text/html\", \"status\": 404, \"step\": 4}]"
+  },
+  {
+    "id": "api_create_with_null_channels_returns_400",
+    "test_case": {
+      "id": "api_create_with_null_channels_returns_400",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"POST\",\"path\":\"/api/v1/checks/\",\"headers\":{\"content-type\":\"application/json\",\"x-api-key\":\"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\"},\"body\":\"{\\\"name\\\":\\\"Test\\\",\\\"timeout\\\":3600,\\\"grace\\\":60,\\\"channels\\\":null}\"},\"expected\":{\"status\":400},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"body\": \"{\\\"badge_url\\\": \\\"http://localhost:8011/b/2/<UUID>.svg\\\", \\\"channels\\\": \\\"\\\", \\\"desc\\\": \\\"\\\", \\\"failure_kw\\\": \\\"\\\", \\\"filter_body\\\": false, \\\"filter_default_fail\\\": false, \\\"filter_http_body\\\": false, \\\"filter_subject\\\": false, \\\"grace\\\": 60, \\\"last_ping\\\": null, \\\"manual_resume\\\": false, \\\"methods\\\": \\\"\\\", \\\"n_pings\\\": 0, \\\"name\\\": \\\"Test\\\", \\\"next_ping\\\": null, \\\"pause_url\\\": \\\"http://localhost:8011/api/v1/checks/<UUID>/pause\\\", \\\"ping_url\\\": \\\"http://localhost:8011/ping/<UUID>\\\", \\\"resume_url\\\": \\\"http://localhost:8011/api/v1/checks/<UUID>/resume\\\", \\\"slug\\\": \\\"test\\\", \\\"start_kw\\\": \\\"\\\", \\\"started\\\": false, \\\"status\\\": \\\"new\\\", \\\"subject\\\": \\\"\\\", \\\"subject_fail\\\": \\\"\\\", \\\"success_kw\\\": \\\"\\\", \\\"tags\\\": \\\"\\\", \\\"timeout\\\": 3600, \\\"update_url\\\": \\\"http://localhost:8011/api/v1/checks/<UUID>\\\", \\\"uuid\\\": \\\"<UUID>\\\"}\", \"content-type\": \"application/json\", \"status\": 201, \"step\": 1}]"
+  },
+  {
+    "id": "accounts_get_project_settings_without_login_redirects",
+    "test_case": {
+      "id": "accounts_get_project_settings_without_login_redirects",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"GET\",\"path\":\"/projects/00000000-0000-0000-0000-000000000000/settings/\"},\"expected\":{\"status\":302},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 404, \"step\": 1}]"
+  },
+  {
+    "id": "integrations_post_with_invalid_email_shows_error",
+    "test_case": {
+      "id": "integrations_post_with_invalid_email_shows_error",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"GET\",\"path\":\"/accounts/login/\"},\"expected\":{\"status\":200},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/accounts/login/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"action=login&email=alice@example.org&password=password&csrfmiddlewaretoken={csrfToken}\"},\"expected\":{\"status\":302},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"GET\",\"path\":\"/\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{\"projectCode\":\"/projects/([0-9a-f-]{36})/\"}},{\"request\":{\"method\":\"GET\",\"path\":\"/projects/{projectCode}/add_email/\"},\"expected\":{\"status\":200},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/projects/{projectCode}/add_email/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"value=not-an-email&up=true&down=true&csrfmiddlewaretoken={csrfToken}\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 200, \"step\": 1}, {\"content-type\": \"text/html\", \"status\": 302, \"step\": 2}, {\"content-type\": \"text/html\", \"status\": 200, \"step\": 3}, {\"content-type\": \"text/html\", \"status\": 200, \"step\": 4}, {\"content-type\": \"text/html\", \"status\": 302, \"step\": 5}]"
+  },
+  {
+    "id": "integrations_add_page_returns_404_when_disabled_7",
+    "test_case": {
+      "id": "integrations_add_page_returns_404_when_disabled_7",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"GET\",\"path\":\"/accounts/login/\"},\"expected\":{\"status\":200},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/accounts/login/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"action=login&email=alice@example.org&password=password&csrfmiddlewaretoken={csrfToken}\"},\"expected\":{\"status\":302},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"GET\",\"path\":\"/\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{\"projectCode\":\"/projects/([0-9a-f-]{36})/\"}},{\"request\":{\"method\":\"GET\",\"path\":\"/projects/{projectCode}/add_pushover/\"},\"expected\":{\"status\":404},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 200, \"step\": 1}, {\"content-type\": \"text/html\", \"status\": 302, \"step\": 2}, {\"content-type\": \"text/html\", \"status\": 200, \"step\": 3}, {\"content-type\": \"text/html\", \"status\": 200, \"step\": 4}]"
+  },
+  {
+    "id": "accounts_post_signup_with_invalid_email_format_returns_error",
+    "test_case": {
+      "id": "accounts_post_signup_with_invalid_email_format_returns_error",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"GET\",\"path\":\"/accounts/signup/csrf/\"},\"expected\":{\"status\":200},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/accounts/signup/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"identity=notanemail&csrfmiddlewaretoken={csrfToken}\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 200, \"step\": 1}, {\"content-type\": \"text/html\", \"status\": 302, \"step\": 2}]"
+  },
+  {
+    "id": "accounts_post_check_token_with_nonexistent_username_redirects",
+    "test_case": {
+      "id": "accounts_post_check_token_with_nonexistent_username_redirects",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"GET\",\"path\":\"/accounts/login/\"},\"expected\":{\"status\":200},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/accounts/check_token/nobody/bad-token/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"csrfmiddlewaretoken={csrfToken}\"},\"expected\":{\"status\":302},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 200, \"step\": 1}, {\"content-type\": \"text/html\", \"status\": 404, \"step\": 2}]"
+  },
+  {
+    "id": "api_create_with_channels_unassigned_name_returns_400",
+    "test_case": {
+      "id": "api_create_with_channels_unassigned_name_returns_400",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"POST\",\"path\":\"/api/v1/checks/\",\"headers\":{\"content-type\":\"application/json\",\"x-api-key\":\"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\"},\"body\":\"{\\\"name\\\":\\\"Test\\\",\\\"timeout\\\":3600,\\\"grace\\\":60,\\\"channels\\\":\\\"nonexistent-channel-name\\\"}\"},\"expected\":{\"status\":400},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"body\": \"{\\\"badge_url\\\": \\\"http://localhost:8011/b/2/<UUID>.svg\\\", \\\"channels\\\": \\\"\\\", \\\"desc\\\": \\\"\\\", \\\"failure_kw\\\": \\\"\\\", \\\"filter_body\\\": false, \\\"filter_default_fail\\\": false, \\\"filter_http_body\\\": false, \\\"filter_subject\\\": false, \\\"grace\\\": 60, \\\"last_ping\\\": null, \\\"manual_resume\\\": false, \\\"methods\\\": \\\"\\\", \\\"n_pings\\\": 0, \\\"name\\\": \\\"Test\\\", \\\"next_ping\\\": null, \\\"pause_url\\\": \\\"http://localhost:8011/api/v1/checks/<UUID>/pause\\\", \\\"ping_url\\\": \\\"http://localhost:8011/ping/<UUID>\\\", \\\"resume_url\\\": \\\"http://localhost:8011/api/v1/checks/<UUID>/resume\\\", \\\"slug\\\": \\\"test\\\", \\\"start_kw\\\": \\\"\\\", \\\"started\\\": false, \\\"status\\\": \\\"new\\\", \\\"subject\\\": \\\"\\\", \\\"subject_fail\\\": \\\"\\\", \\\"success_kw\\\": \\\"\\\", \\\"tags\\\": \\\"\\\", \\\"timeout\\\": 3600, \\\"update_url\\\": \\\"http://localhost:8011/api/v1/checks/<UUID>\\\", \\\"uuid\\\": \\\"<UUID>\\\"}\", \"content-type\": \"application/json\", \"status\": 201, \"step\": 1}]"
+  },
+  {
+    "id": "integrations_channel_lifecycle_create_test_rename_checks_remove_verify_gone_4",
+    "test_case": {
+      "id": "integrations_channel_lifecycle_create_test_rename_checks_remove_verify_gone_4",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"GET\",\"path\":\"/accounts/login/\"},\"expected\":{\"status\":200},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/accounts/login/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"action=login&email=alice@example.org&password=password&csrfmiddlewaretoken={csrfToken}\"},\"expected\":{\"status\":302},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"GET\",\"path\":\"/\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{\"projectCode\":\"/projects/([0-9a-f-]{36})/\"}},{\"request\":{\"method\":\"GET\",\"path\":\"/projects/{projectCode}/add_webhook/\"},\"expected\":{\"status\":200},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/projects/{projectCode}/add_webhook/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"url_down=https%3A%2F%2Fhook.example.com%2Fdown&method_down=POST&url_up=https%3A%2F%2Fhook.example.com%2Fup&method_up=POST&csrfmiddlewaretoken={csrfToken}\"},\"expected\":{\"status\":302},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"GET\",\"path\":\"/projects/{projectCode}/integrations/\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{\"channelCode\":\"/integrations/([0-9a-f-]{36})/\"}},{\"request\":{\"method\":\"POST\",\"path\":\"/integrations/{channelCode}/test/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"csrfmiddlewaretoken={csrfToken}\"},\"expected\":{\"status\":302},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/integrations/{channelCode}/name/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"name=Renamed+Webhook&csrfmiddlewaretoken={csrfToken}\"},\"expected\":{\"status\":302},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"GET\",\"path\":\"/integrations/{channelCode}/edit/\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"GET\",\"path\":\"/api/v1/channels/\",\"headers\":{\"x-api-key\":\"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\"}},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"GET\",\"path\":\"/integrations/{channelCode}/checks/\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/integrations/{channelCode}/remove/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"csrfmiddlewaretoken={csrfToken}\"},\"expected\":{\"status\":302},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"GET\",\"path\":\"/integrations/{channelCode}/edit/\"},\"expected\":{\"status\":404},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/integrations/{channelCode}/test/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"csrfmiddlewaretoken={csrfToken}\"},\"expected\":{\"status\":404},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 200, \"step\": 1}, {\"content-type\": \"text/html\", \"status\": 302, \"step\": 2}, {\"content-type\": \"text/html\", \"status\": 200, \"step\": 3}, {\"content-type\": \"text/html\", \"status\": 200, \"step\": 4}, {\"content-type\": \"text/html\", \"status\": 200, \"step\": 5}, {\"content-type\": \"text/html\", \"status\": 200, \"step\": 6}, {\"error\": \"Template key 'channelCode' not found\", \"step\": 7}, {\"error\": \"Template key 'channelCode' not found\", \"step\": 8}, {\"error\": \"Template key 'channelCode' not found\", \"step\": 9}, {\"body\": \"{\\\"channels\\\": [{\\\"id\\\": \\\"<UUID>\\\", \\\"kind\\\": \\\"webhook\\\", \\\"name\\\": \\\"webhook\\\"}]}\", \"content-type\": \"application/json\", \"status\": 200, \"step\": 10}, {\"error\": \"Template key 'channelCode' not found\", \"step\": 11}, {\"error\": \"Template key 'channelCode' not found\", \"step\": 12}, {\"error\": \"Template key 'channelCode' not found\", \"step\": 13}, {\"error\": \"Template key 'channelCode' not found\", \"step\": 14}]"
+  },
+  {
+    "id": "integrations_edit_email_channel_changes_address_then_verify",
+    "test_case": {
+      "id": "integrations_edit_email_channel_changes_address_then_verify",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"GET\",\"path\":\"/accounts/login/\"},\"expected\":{\"status\":200},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/accounts/login/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"action=login&email=alice@example.org&password=password&csrfmiddlewaretoken={csrfToken}\"},\"expected\":{\"status\":302},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"GET\",\"path\":\"/\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{\"pcode\":\"/projects/([0-9a-f-]{36})/\"}},{\"request\":{\"method\":\"GET\",\"path\":\"/projects/{pcode}/add_email/\"},\"expected\":{\"status\":200},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/projects/{pcode}/add_email/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"value=editverify%40test.com&up=true&down=true&csrfmiddlewaretoken={csrfToken}\"},\"expected\":{\"status\":302},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"GET\",\"path\":\"/projects/{pcode}/integrations/\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{\"chCode\":\"/integrations/([0-9a-f-]{36})/\"}},{\"request\":{\"method\":\"GET\",\"path\":\"/integrations/{chCode}/edit/\"},\"expected\":{\"status\":200},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/integrations/{chCode}/edit/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"value=edited%40test.com&up=true&down=true&csrfmiddlewaretoken={csrfToken}\"},\"expected\":{\"status\":302},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 200, \"step\": 1}, {\"content-type\": \"text/html\", \"status\": 302, \"step\": 2}, {\"content-type\": \"text/html\", \"status\": 200, \"step\": 3}, {\"content-type\": \"text/html\", \"status\": 200, \"step\": 4}, {\"content-type\": \"text/html\", \"status\": 302, \"step\": 5}, {\"content-type\": \"text/html\", \"status\": 200, \"step\": 6}, {\"error\": \"Template key 'chCode' not found\", \"step\": 7}, {\"error\": \"Template key 'chCode' not found\", \"step\": 8}]"
+  },
+  {
+    "id": "front_post_copy_check_redirects",
+    "test_case": {
+      "id": "front_post_copy_check_redirects",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"POST\",\"path\":\"/api/v1/checks/\",\"headers\":{\"content-type\":\"application/json\",\"x-api-key\":\"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\"},\"body\":\"{\\\"name\\\":\\\"Copy Check\\\",\\\"timeout\\\":3600,\\\"grace\\\":60}\"},\"expected\":{\"status\":201},\"storeCookies\":{},\"store\":{\"cpId\":\"$.uuid\"},\"storeHtml\":{}},{\"request\":{\"method\":\"GET\",\"path\":\"/accounts/login/\"},\"expected\":{},\"storeCookies\":{\"cCsrf\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/accounts/login/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"action=login&email=alice@example.org&password=password&csrfmiddlewaretoken={cCsrf}\"},\"expected\":{\"status\":302},\"storeCookies\":{\"cSess\":\"sessionid\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"GET\",\"path\":\"/checks/{cpId}/details/\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{\"cCsrf2\":\"csrfmiddlewaretoken\\\" value=\\\"([^\\\"]+)\\\"\"}},{\"request\":{\"method\":\"POST\",\"path\":\"/checks/{cpId}/copy/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"csrfmiddlewaretoken={cCsrf2}\"},\"expected\":{\"status\":302},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"body\": \"{\\\"badge_url\\\": \\\"http://localhost:8011/b/2/<UUID>.svg\\\", \\\"channels\\\": \\\"\\\", \\\"desc\\\": \\\"\\\", \\\"failure_kw\\\": \\\"\\\", \\\"filter_body\\\": false, \\\"filter_default_fail\\\": false, \\\"filter_http_body\\\": false, \\\"filter_subject\\\": false, \\\"grace\\\": 60, \\\"last_ping\\\": null, \\\"manual_resume\\\": false, \\\"methods\\\": \\\"\\\", \\\"n_pings\\\": 0, \\\"name\\\": \\\"Copy Check\\\", \\\"next_ping\\\": null, \\\"pause_url\\\": \\\"http://localhost:8011/api/v1/checks/<UUID>/pause\\\", \\\"ping_url\\\": \\\"http://localhost:8011/ping/<UUID>\\\", \\\"resume_url\\\": \\\"http://localhost:8011/api/v1/checks/<UUID>/resume\\\", \\\"slug\\\": \\\"copy-check\\\", \\\"start_kw\\\": \\\"\\\", \\\"started\\\": false, \\\"status\\\": \\\"new\\\", \\\"subject\\\": \\\"\\\", \\\"subject_fail\\\": \\\"\\\", \\\"success_kw\\\": \\\"\\\", \\\"tags\\\": \\\"\\\", \\\"timeout\\\": 3600, \\\"update_url\\\": \\\"http://localhost:8011/api/v1/checks/<UUID>\\\", \\\"uuid\\\": \\\"<UUID>\\\"}\", \"content-type\": \"application/json\", \"status\": 201, \"step\": 1}, {\"content-type\": \"text/html\", \"status\": 200, \"step\": 2}, {\"content-type\": \"text/html\", \"status\": 302, \"step\": 3}, {\"content-type\": \"text/html\", \"status\": 200, \"step\": 4}, {\"content-type\": \"text/html\", \"status\": 404, \"step\": 5}]"
+  },
+  {
+    "id": "front_post_update_timeout_with_cron_schedule_redirects",
+    "test_case": {
+      "id": "front_post_update_timeout_with_cron_schedule_redirects",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"GET\",\"path\":\"/accounts/login/\"},\"expected\":{},\"storeCookies\":{\"ucCsrf\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/accounts/login/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"action=login&email=alice@example.org&password=password&csrfmiddlewaretoken={ucCsrf}\"},\"expected\":{\"status\":302},\"storeCookies\":{\"ucSess\":\"sessionid\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/api/v1/checks/\",\"headers\":{\"content-type\":\"application/json\",\"x-api-key\":\"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\"},\"body\":\"{\\\"name\\\":\\\"Cron Timeout\\\",\\\"timeout\\\":3600,\\\"grace\\\":60}\"},\"expected\":{\"status\":201},\"storeCookies\":{},\"store\":{\"ucCheckId\":\"$.uuid\"},\"storeHtml\":{}},{\"request\":{\"method\":\"GET\",\"path\":\"/checks/{ucCheckId}/details/\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{\"ucCsrfToken\":\"csrfmiddlewaretoken\\\" value=\\\"([^\\\"]+)\\\"\"}},{\"request\":{\"method\":\"POST\",\"path\":\"/checks/{ucCheckId}/timeout/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"csrfmiddlewaretoken={ucCsrfToken}&kind=cron&schedule=*/5+*+*+*+*&tz=UTC&grace=120\"},\"expected\":{\"status\":302},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 200, \"step\": 1}, {\"content-type\": \"text/html\", \"status\": 302, \"step\": 2}, {\"body\": \"{\\\"badge_url\\\": \\\"http://localhost:8011/b/2/<UUID>.svg\\\", \\\"channels\\\": \\\"\\\", \\\"desc\\\": \\\"\\\", \\\"failure_kw\\\": \\\"\\\", \\\"filter_body\\\": false, \\\"filter_default_fail\\\": false, \\\"filter_http_body\\\": false, \\\"filter_subject\\\": false, \\\"grace\\\": 60, \\\"last_ping\\\": null, \\\"manual_resume\\\": false, \\\"methods\\\": \\\"\\\", \\\"n_pings\\\": 0, \\\"name\\\": \\\"Cron Timeout\\\", \\\"next_ping\\\": null, \\\"pause_url\\\": \\\"http://localhost:8011/api/v1/checks/<UUID>/pause\\\", \\\"ping_url\\\": \\\"http://localhost:8011/ping/<UUID>\\\", \\\"resume_url\\\": \\\"http://localhost:8011/api/v1/checks/<UUID>/resume\\\", \\\"slug\\\": \\\"cron-timeout\\\", \\\"start_kw\\\": \\\"\\\", \\\"started\\\": false, \\\"status\\\": \\\"new\\\", \\\"subject\\\": \\\"\\\", \\\"subject_fail\\\": \\\"\\\", \\\"success_kw\\\": \\\"\\\", \\\"tags\\\": \\\"\\\", \\\"timeout\\\": 3600, \\\"update_url\\\": \\\"http://localhost:8011/api/v1/checks/<UUID>\\\", \\\"uuid\\\": \\\"<UUID>\\\"}\", \"content-type\": \"application/json\", \"status\": 201, \"step\": 3}, {\"content-type\": \"text/html\", \"status\": 200, \"step\": 4}, {\"content-type\": \"text/html\", \"status\": 404, \"step\": 5}]"
+  },
+  {
+    "id": "front_get_tv_with_checks_shows_check_count",
+    "test_case": {
+      "id": "front_get_tv_with_checks_shows_check_count",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"POST\",\"path\":\"/api/v1/checks/\",\"headers\":{\"content-type\":\"application/json\",\"x-api-key\":\"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\"},\"body\":\"{\\\"name\\\":\\\"TV Check 1\\\",\\\"timeout\\\":3600,\\\"grace\\\":60}\"},\"expected\":{\"status\":201},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/api/v1/checks/\",\"headers\":{\"content-type\":\"application/json\",\"x-api-key\":\"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\"},\"body\":\"{\\\"name\\\":\\\"TV Check 2\\\",\\\"timeout\\\":3600,\\\"grace\\\":60}\"},\"expected\":{\"status\":201},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"GET\",\"path\":\"/tv/\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"body\": \"{\\\"badge_url\\\": \\\"http://localhost:8011/b/2/<UUID>.svg\\\", \\\"channels\\\": \\\"\\\", \\\"desc\\\": \\\"\\\", \\\"failure_kw\\\": \\\"\\\", \\\"filter_body\\\": false, \\\"filter_default_fail\\\": false, \\\"filter_http_body\\\": false, \\\"filter_subject\\\": false, \\\"grace\\\": 60, \\\"last_ping\\\": null, \\\"manual_resume\\\": false, \\\"methods\\\": \\\"\\\", \\\"n_pings\\\": 0, \\\"name\\\": \\\"TV Check 1\\\", \\\"next_ping\\\": null, \\\"pause_url\\\": \\\"http://localhost:8011/api/v1/checks/<UUID>/pause\\\", \\\"ping_url\\\": \\\"http://localhost:8011/ping/<UUID>\\\", \\\"resume_url\\\": \\\"http://localhost:8011/api/v1/checks/<UUID>/resume\\\", \\\"slug\\\": \\\"tv-check-1\\\", \\\"start_kw\\\": \\\"\\\", \\\"started\\\": false, \\\"status\\\": \\\"new\\\", \\\"subject\\\": \\\"\\\", \\\"subject_fail\\\": \\\"\\\", \\\"success_kw\\\": \\\"\\\", \\\"tags\\\": \\\"\\\", \\\"timeout\\\": 3600, \\\"update_url\\\": \\\"http://localhost:8011/api/v1/checks/<UUID>\\\", \\\"uuid\\\": \\\"<UUID>\\\"}\", \"content-type\": \"application/json\", \"status\": 201, \"step\": 1}, {\"body\": \"{\\\"badge_url\\\": \\\"http://localhost:8011/b/2/<UUID>.svg\\\", \\\"channels\\\": \\\"\\\", \\\"desc\\\": \\\"\\\", \\\"failure_kw\\\": \\\"\\\", \\\"filter_body\\\": false, \\\"filter_default_fail\\\": false, \\\"filter_http_body\\\": false, \\\"filter_subject\\\": false, \\\"grace\\\": 60, \\\"last_ping\\\": null, \\\"manual_resume\\\": false, \\\"methods\\\": \\\"\\\", \\\"n_pings\\\": 0, \\\"name\\\": \\\"TV Check 2\\\", \\\"next_ping\\\": null, \\\"pause_url\\\": \\\"http://localhost:8011/api/v1/checks/<UUID>/pause\\\", \\\"ping_url\\\": \\\"http://localhost:8011/ping/<UUID>\\\", \\\"resume_url\\\": \\\"http://localhost:8011/api/v1/checks/<UUID>/resume\\\", \\\"slug\\\": \\\"tv-check-2\\\", \\\"start_kw\\\": \\\"\\\", \\\"started\\\": false, \\\"status\\\": \\\"new\\\", \\\"subject\\\": \\\"\\\", \\\"subject_fail\\\": \\\"\\\", \\\"success_kw\\\": \\\"\\\", \\\"tags\\\": \\\"\\\", \\\"timeout\\\": 3600, \\\"update_url\\\": \\\"http://localhost:8011/api/v1/checks/<UUID>\\\", \\\"uuid\\\": \\\"<UUID>\\\"}\", \"content-type\": \"application/json\", \"status\": 201, \"step\": 2}, {\"content-type\": \"text/html\", \"status\": 404, \"step\": 3}]"
+  },
+  {
+    "id": "integrations_add_page_returns_404_when_disabled_3",
+    "test_case": {
+      "id": "integrations_add_page_returns_404_when_disabled_3",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"GET\",\"path\":\"/accounts/login/\"},\"expected\":{\"status\":200},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/accounts/login/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"action=login&email=alice@example.org&password=password&csrfmiddlewaretoken={csrfToken}\"},\"expected\":{\"status\":302},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"GET\",\"path\":\"/\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{\"projectCode\":\"/projects/([0-9a-f-]{36})/\"}},{\"request\":{\"method\":\"GET\",\"path\":\"/projects/{projectCode}/add_discord/\"},\"expected\":{\"status\":404},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 200, \"step\": 1}, {\"content-type\": \"text/html\", \"status\": 302, \"step\": 2}, {\"content-type\": \"text/html\", \"status\": 200, \"step\": 3}, {\"content-type\": \"text/html\", \"status\": 200, \"step\": 4}]"
+  },
+  {
+    "id": "accounts_get_accountsprofileappearance_as_alice_returns_200",
+    "test_case": {
+      "id": "accounts_get_accountsprofileappearance_as_alice_returns_200",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"GET\",\"path\":\"/accounts/login/\"},\"expected\":{\"status\":200},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/accounts/login/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"action=login&email=alice@example.org&password=password&csrfmiddlewaretoken={csrfToken}\"},\"expected\":{\"status\":302},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"GET\",\"path\":\"/accounts/profile/appearance/\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 200, \"step\": 1}, {\"content-type\": \"text/html\", \"status\": 302, \"step\": 2}, {\"content-type\": \"text/html\", \"status\": 404, \"step\": 3}]"
+  },
+  {
+    "id": "integrations_add_page_returns_404_when_disabled_6",
+    "test_case": {
+      "id": "integrations_add_page_returns_404_when_disabled_6",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"GET\",\"path\":\"/accounts/login/\"},\"expected\":{\"status\":200},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/accounts/login/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"action=login&email=alice@example.org&password=password&csrfmiddlewaretoken={csrfToken}\"},\"expected\":{\"status\":302},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"GET\",\"path\":\"/\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{\"projectCode\":\"/projects/([0-9a-f-]{36})/\"}},{\"request\":{\"method\":\"GET\",\"path\":\"/projects/{projectCode}/add_pushbullet/\"},\"expected\":{\"status\":404},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 200, \"step\": 1}, {\"content-type\": \"text/html\", \"status\": 302, \"step\": 2}, {\"content-type\": \"text/html\", \"status\": 200, \"step\": 3}, {\"content-type\": \"text/html\", \"status\": 200, \"step\": 4}]"
+  },
+  {
+    "id": "accounts_post_signup_with_valid_email_renders_result_page",
+    "test_case": {
+      "id": "accounts_post_signup_with_valid_email_renders_result_page",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"GET\",\"path\":\"/accounts/signup/csrf/\"},\"expected\":{\"status\":200},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/accounts/signup/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"identity=newuser@example.org&csrfmiddlewaretoken={csrfToken}\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 200, \"step\": 1}, {\"content-type\": \"text/html\", \"status\": 302, \"step\": 2}]"
+  },
+  {
+    "id": "front_add_email_channel_with_invalid_email_format_shows_error",
+    "test_case": {
+      "id": "front_add_email_channel_with_invalid_email_format_shows_error",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"GET\",\"path\":\"/accounts/login/\"},\"expected\":{},\"storeCookies\":{\"nc1Csrf\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/accounts/login/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"action=login&email=alice@example.org&password=password&csrfmiddlewaretoken={nc1Csrf}\"},\"expected\":{\"status\":302},\"storeCookies\":{\"nc1Sess\":\"sessionid\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"GET\",\"path\":\"/\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{\"nc1Pid\":\"/projects/([0-9a-f-]+)/\"}},{\"request\":{\"method\":\"GET\",\"path\":\"/projects/{nc1Pid}/add_email/\"},\"expected\":{\"status\":200},\"storeCookies\":{\"nc1Csrf2\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/projects/{nc1Pid}/add_email/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"value=notanemail&down=true&up=true&csrfmiddlewaretoken={nc1Csrf2}\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 200, \"step\": 1}, {\"content-type\": \"text/html\", \"status\": 302, \"step\": 2}, {\"content-type\": \"text/html\", \"status\": 200, \"step\": 3}, {\"content-type\": \"text/html\", \"status\": 200, \"step\": 4}, {\"content-type\": \"text/html\", \"status\": 302, \"step\": 5}]"
+  },
+  {
+    "id": "api_get_project_metrics_with_invalid_key_returns_401",
+    "test_case": {
+      "id": "api_get_project_metrics_with_invalid_key_returns_401",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"GET\",\"path\":\"/projects/00000000-0000-0000-0000-000000000000/metrics/invalid\"},\"expected\":{\"status\":400},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 404, \"step\": 1}]"
+  },
+  {
+    "id": "integrations_channel_lifecycle_create_test_rename_checks_remove_verify_gone",
+    "test_case": {
+      "id": "integrations_channel_lifecycle_create_test_rename_checks_remove_verify_gone",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"GET\",\"path\":\"/accounts/login/\"},\"expected\":{\"status\":200},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/accounts/login/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"action=login&email=alice@example.org&password=password&csrfmiddlewaretoken={csrfToken}\"},\"expected\":{\"status\":302},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"GET\",\"path\":\"/\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{\"projectCode\":\"/projects/([0-9a-f-]{36})/\"}},{\"request\":{\"method\":\"GET\",\"path\":\"/projects/{projectCode}/add_email/\"},\"expected\":{\"status\":200},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/projects/{projectCode}/add_email/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"value=test%40example.com&up=true&down=true&csrfmiddlewaretoken={csrfToken}\"},\"expected\":{\"status\":302},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"GET\",\"path\":\"/projects/{projectCode}/integrations/\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{\"channelCode\":\"/integrations/([0-9a-f-]{36})/\"}},{\"request\":{\"method\":\"POST\",\"path\":\"/integrations/{channelCode}/test/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"csrfmiddlewaretoken={csrfToken}\"},\"expected\":{\"status\":302},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/integrations/{channelCode}/name/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"name=Renamed+Email&csrfmiddlewaretoken={csrfToken}\"},\"expected\":{\"status\":302},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"GET\",\"path\":\"/integrations/{channelCode}/edit/\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"GET\",\"path\":\"/api/v1/channels/\",\"headers\":{\"x-api-key\":\"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\"}},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"GET\",\"path\":\"/integrations/{channelCode}/checks/\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/integrations/{channelCode}/remove/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"csrfmiddlewaretoken={csrfToken}\"},\"expected\":{\"status\":302},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"GET\",\"path\":\"/integrations/{channelCode}/edit/\"},\"expected\":{\"status\":404},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/integrations/{channelCode}/test/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"csrfmiddlewaretoken={csrfToken}\"},\"expected\":{\"status\":404},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 200, \"step\": 1}, {\"content-type\": \"text/html\", \"status\": 302, \"step\": 2}, {\"content-type\": \"text/html\", \"status\": 200, \"step\": 3}, {\"content-type\": \"text/html\", \"status\": 200, \"step\": 4}, {\"content-type\": \"text/html\", \"status\": 302, \"step\": 5}, {\"content-type\": \"text/html\", \"status\": 200, \"step\": 6}, {\"error\": \"Template key 'channelCode' not found\", \"step\": 7}, {\"error\": \"Template key 'channelCode' not found\", \"step\": 8}, {\"error\": \"Template key 'channelCode' not found\", \"step\": 9}, {\"body\": \"{\\\"channels\\\": [{\\\"id\\\": \\\"<UUID>\\\", \\\"kind\\\": \\\"email\\\", \\\"name\\\": \\\"email\\\"}]}\", \"content-type\": \"application/json\", \"status\": 200, \"step\": 10}, {\"error\": \"Template key 'channelCode' not found\", \"step\": 11}, {\"error\": \"Template key 'channelCode' not found\", \"step\": 12}, {\"error\": \"Template key 'channelCode' not found\", \"step\": 13}, {\"error\": \"Template key 'channelCode' not found\", \"step\": 14}]"
+  },
+  {
+    "id": "accounts_post_add_totp_with_invalid_code_shows_errors",
+    "test_case": {
+      "id": "accounts_post_add_totp_with_invalid_code_shows_errors",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"GET\",\"path\":\"/accounts/login/\"},\"expected\":{\"status\":200},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/accounts/login/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"action=login&email=alice@example.org&password=password&csrfmiddlewaretoken={csrfToken}\"},\"expected\":{\"status\":302},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"GET\",\"path\":\"/accounts/two_factor/totp/\"},\"expected\":{\"status\":200},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/accounts/two_factor/totp/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"code=123456&csrfmiddlewaretoken={csrfToken}\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 200, \"step\": 1}, {\"content-type\": \"text/html\", \"status\": 302, \"step\": 2}, {\"content-type\": \"text/html\", \"status\": 404, \"step\": 3}, {\"content-type\": \"text/html\", \"status\": 404, \"step\": 4}]"
+  },
+  {
+    "id": "integrations_add_channel_for_webhook_with_all_fields_filled_redirects",
+    "test_case": {
+      "id": "integrations_add_channel_for_webhook_with_all_fields_filled_redirects",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"GET\",\"path\":\"/accounts/login/\"},\"expected\":{\"status\":200},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/accounts/login/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"action=login&email=alice@example.org&password=password&csrfmiddlewaretoken={csrfToken}\"},\"expected\":{\"status\":302},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"GET\",\"path\":\"/\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{\"pcode\":\"/projects/([0-9a-f-]{36})/\"}},{\"request\":{\"method\":\"GET\",\"path\":\"/projects/{pcode}/add_webhook/\"},\"expected\":{\"status\":200},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/projects/{pcode}/add_webhook/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"url_down=https%3A%2F%2Fdown.example.com&method_down=POST&body_down=%7B%22status%22%3A%22down%22%7D&headers_down=X-Custom%3A+value&url_up=https%3A%2F%2Fup.example.com&method_up=POST&body_up=%7B%22status%22%3A%22up%22%7D&headers_up=X-Custom%3A+value&csrfmiddlewaretoken={csrfToken}\"},\"expected\":{\"status\":302},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 200, \"step\": 1}, {\"content-type\": \"text/html\", \"status\": 302, \"step\": 2}, {\"content-type\": \"text/html\", \"status\": 200, \"step\": 3}, {\"content-type\": \"text/html\", \"status\": 200, \"step\": 4}, {\"content-type\": \"text/html\", \"status\": 200, \"step\": 5}]"
+  },
+  {
+    "id": "accounts_post_login_with_uppercase_email_fails_as_case_sensitive",
+    "test_case": {
+      "id": "accounts_post_login_with_uppercase_email_fails_as_case_sensitive",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"GET\",\"path\":\"/accounts/login/\"},\"expected\":{\"status\":200},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/accounts/login/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"action=login&email=ALICE@EXAMPLE.ORG&password=password&csrfmiddlewaretoken={csrfToken}\"},\"expected\":{\"status\":302},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 200, \"step\": 1}, {\"content-type\": \"text/html\", \"status\": 200, \"step\": 2}]"
+  },
+  {
+    "id": "accounts_get_unsubscribe_with_bad_token_shows_error",
+    "test_case": {
+      "id": "accounts_get_unsubscribe_with_bad_token_shows_error",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"GET\",\"path\":\"/accounts/unsubscribe_reports/invalid-signed-token/\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 404, \"step\": 1}]"
+  },
+  {
+    "id": "front_submit_add_check_with_empty_name_shows_error",
+    "test_case": {
+      "id": "front_submit_add_check_with_empty_name_shows_error",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"GET\",\"path\":\"/accounts/login/\"},\"expected\":{},\"storeCookies\":{\"nc1Csrf\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/accounts/login/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"action=login&email=alice@example.org&password=password&csrfmiddlewaretoken={nc1Csrf}\"},\"expected\":{\"status\":302},\"storeCookies\":{\"nc1Sess\":\"sessionid\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"GET\",\"path\":\"/\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{\"nc1Pid\":\"/projects/([0-9a-f-]+)/\"}},{\"request\":{\"method\":\"POST\",\"path\":\"/projects/{nc1Pid}/checks/add/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"name=&kind=simple&timeout=3600&grace=60&tz=UTC&csrfmiddlewaretoken={nc1Csrf}\"},\"expected\":{\"status\":403},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 200, \"step\": 1}, {\"content-type\": \"text/html\", \"status\": 302, \"step\": 2}, {\"content-type\": \"text/html\", \"status\": 200, \"step\": 3}, {\"content-type\": \"text/html\", \"status\": 404, \"step\": 4}]"
+  },
+  {
+    "id": "api_list_flips_without_api_key_returns_401",
+    "test_case": {
+      "id": "api_list_flips_without_api_key_returns_401",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"GET\",\"path\":\"/api/v1/checks/00000000-0000-0000-0000-000000000000/flips/\"},\"expected\":{\"status\":401},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 404, \"step\": 1}]"
+  },
+  {
+    "id": "accounts_post_change_email_with_existing_email_rejected",
+    "test_case": {
+      "id": "accounts_post_change_email_with_existing_email_rejected",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"GET\",\"path\":\"/accounts/login/\"},\"expected\":{\"status\":200},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/accounts/login/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"action=login&email=alice@example.org&password=password&csrfmiddlewaretoken={csrfToken}\"},\"expected\":{\"status\":302},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"GET\",\"path\":\"/accounts/change_email/\"},\"expected\":{\"status\":200},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/accounts/change_email/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"email=bob%40example.org&csrfmiddlewaretoken={csrfToken}\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 200, \"step\": 1}, {\"content-type\": \"text/html\", \"status\": 302, \"step\": 2}, {\"content-type\": \"text/html\", \"status\": 200, \"step\": 3}, {\"content-type\": \"text/html\", \"status\": 302, \"step\": 4}]"
+  },
+  {
+    "id": "accounts_get_appearance_when_logged_in_returns_200",
+    "test_case": {
+      "id": "accounts_get_appearance_when_logged_in_returns_200",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"GET\",\"path\":\"/accounts/login/\"},\"expected\":{\"status\":200},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/accounts/login/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"action=login&email=alice@example.org&password=password&csrfmiddlewaretoken={csrfToken}\"},\"expected\":{\"status\":302},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"GET\",\"path\":\"/accounts/profile/appearance/\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 200, \"step\": 1}, {\"content-type\": \"text/html\", \"status\": 302, \"step\": 2}, {\"content-type\": \"text/html\", \"status\": 404, \"step\": 3}]"
+  },
+  {
+    "id": "front_submit_add_check_with_timeout_below_60_shows_error",
+    "test_case": {
+      "id": "front_submit_add_check_with_timeout_below_60_shows_error",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"GET\",\"path\":\"/accounts/login/\"},\"expected\":{},\"storeCookies\":{\"nc3Csrf\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/accounts/login/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"action=login&email=alice@example.org&password=password&csrfmiddlewaretoken={nc3Csrf}\"},\"expected\":{\"status\":302},\"storeCookies\":{\"nc3Sess\":\"sessionid\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"GET\",\"path\":\"/\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{\"nc3Pid\":\"/projects/([0-9a-f-]+)/\"}},{\"request\":{\"method\":\"POST\",\"path\":\"/projects/{nc3Pid}/checks/add/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"name=Test&kind=simple&timeout=1&grace=60&tz=UTC&csrfmiddlewaretoken={nc3Csrf}\"},\"expected\":{\"status\":403},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 200, \"step\": 1}, {\"content-type\": \"text/html\", \"status\": 302, \"step\": 2}, {\"content-type\": \"text/html\", \"status\": 200, \"step\": 3}, {\"content-type\": \"text/html\", \"status\": 404, \"step\": 4}]"
+  },
+  {
+    "id": "accounts_post_check_token_with_invalid_token_redirects_to_login",
+    "test_case": {
+      "id": "accounts_post_check_token_with_invalid_token_redirects_to_login",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"GET\",\"path\":\"/accounts/login/\"},\"expected\":{\"status\":200},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/accounts/check_token/alice/invalid-token/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"csrfmiddlewaretoken={csrfToken}\"},\"expected\":{\"status\":302},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 200, \"step\": 1}, {\"content-type\": \"text/html\", \"status\": 404, \"step\": 2}]"
+  },
+  {
+    "id": "front_get_docs_returns_docs_homepage",
+    "test_case": {
+      "id": "front_get_docs_returns_docs_homepage",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"GET\",\"path\":\"/docs/\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 404, \"step\": 1}]"
+  },
+  {
+    "id": "front_post_cron_preview_with_valid_expression_and_csrf",
+    "test_case": {
+      "id": "front_post_cron_preview_with_valid_expression_and_csrf",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"GET\",\"path\":\"/accounts/login/\"},\"expected\":{\"status\":200},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/checks/cron_preview/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"schedule=*/5+*+*+*+*&tz=UTC&csrfmiddlewaretoken={csrfToken}\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 200, \"step\": 1}, {\"content-type\": \"text/html\", \"status\": 404, \"step\": 2}]"
+  },
+  {
+    "id": "api_subject_fail_201_chars_400",
+    "test_case": {
+      "id": "api_subject_fail_201_chars_400",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"POST\",\"path\":\"/api/v1/checks/\",\"headers\":{\"content-type\":\"application/json\",\"x-api-key\":\"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\"},\"body\":\"{\\\"name\\\":\\\"Test\\\",\\\"subject_fail\\\":\\\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\\\",\\\"timeout\\\":3600,\\\"grace\\\":60}\"},\"expected\":{\"status\":400},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"body\": \"{\\\"badge_url\\\": \\\"http://localhost:8011/b/2/<UUID>.svg\\\", \\\"channels\\\": \\\"\\\", \\\"desc\\\": \\\"\\\", \\\"failure_kw\\\": \\\"<TOKEN>\\\", \\\"filter_body\\\": false, \\\"filter_default_fail\\\": false, \\\"filter_http_body\\\": false, \\\"filter_subject\\\": true, \\\"grace\\\": 60, \\\"last_ping\\\": null, \\\"manual_resume\\\": false, \\\"methods\\\": \\\"\\\", \\\"n_pings\\\": 0, \\\"name\\\": \\\"Test\\\", \\\"next_ping\\\": null, \\\"pause_url\\\": \\\"http://localhost:8011/api/v1/checks/<UUID>/pause\\\", \\\"ping_url\\\": \\\"http://localhost:8011/ping/<UUID>\\\", \\\"resume_url\\\": \\\"http://localhost:8011/api/v1/checks/<UUID>/resume\\\", \\\"slug\\\": \\\"test\\\", \\\"start_kw\\\": \\\"\\\", \\\"started\\\": false, \\\"status\\\": \\\"new\\\", \\\"subject\\\": \\\"\\\", \\\"subject_fail\\\": \\\"<TOKEN>\\\", \\\"success_kw\\\": \\\"\\\", \\\"tags\\\": \\\"\\\", \\\"timeout\\\": 3600, \\\"update_url\\\": \\\"http://localhost:8011/api/v1/checks/<UUID>\\\", \\\"uuid\\\": \\\"<UUID>\\\"}\", \"content-type\": \"application/json\", \"status\": 201, \"step\": 1}]"
+  },
+  {
+    "id": "accounts_get_set_password_with_wrong_current_password_shows_error",
+    "test_case": {
+      "id": "accounts_get_set_password_with_wrong_current_password_shows_error",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"GET\",\"path\":\"/accounts/login/\"},\"expected\":{},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/accounts/login/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"action=login&email=alice@example.org&password=password&csrfmiddlewaretoken={csrfToken}\"},\"expected\":{\"status\":302},\"storeCookies\":{\"sessionId\":\"sessionid\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"GET\",\"path\":\"/accounts/set_password/\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{\"pwCsrf\":\"csrfmiddlewaretoken\\\" value=\\\"([^\\\"]+)\\\"\"}},{\"request\":{\"method\":\"POST\",\"path\":\"/accounts/set_password/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"csrfmiddlewaretoken={pwCsrf}&current_password=wrongpass&password=NewPass123&password2=NewPass123\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 200, \"step\": 1}, {\"content-type\": \"text/html\", \"status\": 302, \"step\": 2}, {\"content-type\": \"text/html\", \"status\": 200, \"step\": 3}, {\"content-type\": \"text/html\", \"status\": 302, \"step\": 4}]"
+  },
+  {
+    "id": "api_post_notification_status_with_failed_sets_error",
+    "test_case": {
+      "id": "api_post_notification_status_with_failed_sets_error",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"POST\",\"path\":\"/api/v1/notifications/00000000-0000-0000-0000-000000000000/status\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"MessageStatus=failed\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 404, \"step\": 1}]"
+  },
+  {
+    "id": "integrations_add_page_returns_404_when_disabled_5",
+    "test_case": {
+      "id": "integrations_add_page_returns_404_when_disabled_5",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"GET\",\"path\":\"/accounts/login/\"},\"expected\":{\"status\":200},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/accounts/login/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"action=login&email=alice@example.org&password=password&csrfmiddlewaretoken={csrfToken}\"},\"expected\":{\"status\":302},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"GET\",\"path\":\"/\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{\"projectCode\":\"/projects/([0-9a-f-]{36})/\"}},{\"request\":{\"method\":\"GET\",\"path\":\"/projects/{projectCode}/add_matrix/\"},\"expected\":{\"status\":404},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 200, \"step\": 1}, {\"content-type\": \"text/html\", \"status\": 302, \"step\": 2}, {\"content-type\": \"text/html\", \"status\": 200, \"step\": 3}, {\"content-type\": \"text/html\", \"status\": 200, \"step\": 4}]"
+  },
+  {
+    "id": "accounts_get_project_settings_page_includes_transfer_section",
+    "test_case": {
+      "id": "accounts_get_project_settings_page_includes_transfer_section",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"GET\",\"path\":\"/accounts/login/\"},\"expected\":{},\"storeCookies\":{\"tCsrf\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/accounts/login/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"action=login&email=alice@example.org&password=password&csrfmiddlewaretoken={tCsrf}\"},\"expected\":{\"status\":302},\"storeCookies\":{\"tSess\":\"sessionid\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"GET\",\"path\":\"/\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{\"tProjId\":\"/projects/([0-9a-f-]+)/\"}},{\"request\":{\"method\":\"GET\",\"path\":\"/projects/{tProjId}/settings/\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 200, \"step\": 1}, {\"content-type\": \"text/html\", \"status\": 302, \"step\": 2}, {\"content-type\": \"text/html\", \"status\": 200, \"step\": 3}, {\"content-type\": \"text/html\", \"status\": 404, \"step\": 4}]"
+  },
+  {
+    "id": "front_post_add_check_via_project_page_redirects",
+    "test_case": {
+      "id": "front_post_add_check_via_project_page_redirects",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"GET\",\"path\":\"/accounts/login/\"},\"expected\":{},\"storeCookies\":{\"bCsrf\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/accounts/login/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"action=login&email=alice@example.org&password=password&csrfmiddlewaretoken={bCsrf}\"},\"expected\":{\"status\":302},\"storeCookies\":{\"bSess\":\"sessionid\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"GET\",\"path\":\"/\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{\"pCode\":\"/projects/([0-9a-f-]+)/\"}},{\"request\":{\"method\":\"GET\",\"path\":\"/projects/{pCode}/checks/\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{\"aCsrf2\":\"csrfmiddlewaretoken\\\" value=\\\"([^\\\"]+)\\\"\"}},{\"request\":{\"method\":\"POST\",\"path\":\"/projects/{pCode}/checks/add/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"name=Simple+Check&kind=simple&timeout=3600&grace=60&csrfmiddlewaretoken={aCsrf2}\"},\"expected\":{\"status\":400},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 200, \"step\": 1}, {\"content-type\": \"text/html\", \"status\": 302, \"step\": 2}, {\"content-type\": \"text/html\", \"status\": 200, \"step\": 3}, {\"content-type\": \"text/html\", \"status\": 200, \"step\": 4}, {\"content-type\": \"text/html\", \"status\": 404, \"step\": 5}]"
+  },
+  {
+    "id": "front_get_docs_search_with_empty_query",
+    "test_case": {
+      "id": "front_get_docs_search_with_empty_query",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"GET\",\"path\":\"/docs/search/\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 404, \"step\": 1}]"
+  },
+  {
+    "id": "integrations_post_with_empty_value_shows_error",
+    "test_case": {
+      "id": "integrations_post_with_empty_value_shows_error",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"GET\",\"path\":\"/accounts/login/\"},\"expected\":{\"status\":200},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/accounts/login/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"action=login&email=alice@example.org&password=password&csrfmiddlewaretoken={csrfToken}\"},\"expected\":{\"status\":302},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"GET\",\"path\":\"/\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{\"projectCode\":\"/projects/([0-9a-f-]{36})/\"}},{\"request\":{\"method\":\"GET\",\"path\":\"/projects/{projectCode}/add_slack/\"},\"expected\":{\"status\":200},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/projects/{projectCode}/add_slack/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"value=&csrfmiddlewaretoken={csrfToken}\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 200, \"step\": 1}, {\"content-type\": \"text/html\", \"status\": 302, \"step\": 2}, {\"content-type\": \"text/html\", \"status\": 200, \"step\": 3}, {\"content-type\": \"text/html\", \"status\": 200, \"step\": 4}, {\"content-type\": \"text/html\", \"status\": 302, \"step\": 5}]"
+  },
+  {
+    "id": "front_get_docssearchqa_returns_results_for_very_short_term",
+    "test_case": {
+      "id": "front_get_docssearchqa_returns_results_for_very_short_term",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"GET\",\"path\":\"/docs/search/?q=a\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 404, \"step\": 1}]"
+  },
+  {
+    "id": "accounts_post_signup_with_valid_data_and_password_creates_user_page",
+    "test_case": {
+      "id": "accounts_post_signup_with_valid_data_and_password_creates_user_page",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"GET\",\"path\":\"/accounts/signup/csrf/\"},\"expected\":{\"status\":200},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/accounts/signup/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"identity=signuptest%40example.org&password=strongpass123&csrfmiddlewaretoken={csrfToken}\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 200, \"step\": 1}, {\"content-type\": \"text/html\", \"status\": 302, \"step\": 2}]"
+  },
+  {
+    "id": "front_get_without_auth_redirects_to_login",
+    "test_case": {
+      "id": "front_get_without_auth_redirects_to_login",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"GET\",\"path\":\"/\"},\"expected\":{\"status\":302},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 200, \"step\": 1}]"
+  },
+  {
+    "id": "accounts_post_appearance_with_theme_auto_returns_200_or_302",
+    "test_case": {
+      "id": "accounts_post_appearance_with_theme_auto_returns_200_or_302",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"GET\",\"path\":\"/accounts/login/\"},\"expected\":{\"status\":200},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/accounts/login/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"action=login&email=alice@example.org&password=password&csrfmiddlewaretoken={csrfToken}\"},\"expected\":{\"status\":302},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"GET\",\"path\":\"/accounts/profile/appearance/\"},\"expected\":{\"status\":200},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/accounts/profile/appearance/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"theme=auto&csrfmiddlewaretoken={csrfToken}\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 200, \"step\": 1}, {\"content-type\": \"text/html\", \"status\": 302, \"step\": 2}, {\"content-type\": \"text/html\", \"status\": 404, \"step\": 3}, {\"content-type\": \"text/html\", \"status\": 200, \"step\": 4}]"
+  },
+  {
+    "id": "integrations_channel_lifecycle_create_test_rename_checks_remove_verify_gone_2",
+    "test_case": {
+      "id": "integrations_channel_lifecycle_create_test_rename_checks_remove_verify_gone_2",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"GET\",\"path\":\"/accounts/login/\"},\"expected\":{\"status\":200},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/accounts/login/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"action=login&email=alice@example.org&password=password&csrfmiddlewaretoken={csrfToken}\"},\"expected\":{\"status\":302},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"GET\",\"path\":\"/\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{\"projectCode\":\"/projects/([0-9a-f-]{36})/\"}},{\"request\":{\"method\":\"GET\",\"path\":\"/projects/{projectCode}/add_email/\"},\"expected\":{\"status\":200},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/projects/{projectCode}/add_email/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"value=group-test%40example.com&up=true&down=true&csrfmiddlewaretoken={csrfToken}\"},\"expected\":{\"status\":302},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"GET\",\"path\":\"/projects/{projectCode}/integrations/\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{\"emailCode\":\"/integrations/([0-9a-f-]{36})/\"}},{\"request\":{\"method\":\"GET\",\"path\":\"/projects/{projectCode}/add_group/\"},\"expected\":{\"status\":200},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/projects/{projectCode}/add_group/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"label=MyGroup&channels={emailCode}&csrfmiddlewaretoken={csrfToken}\"},\"expected\":{\"status\":302},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"GET\",\"path\":\"/projects/{projectCode}/integrations/\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{\"channelCode\":\"/integrations/([0-9a-f-]{36})/\"}},{\"request\":{\"method\":\"POST\",\"path\":\"/integrations/{channelCode}/test/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"csrfmiddlewaretoken={csrfToken}\"},\"expected\":{\"status\":302},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/integrations/{channelCode}/name/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"name=Renamed+Group&csrfmiddlewaretoken={csrfToken}\"},\"expected\":{\"status\":302},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"GET\",\"path\":\"/integrations/{channelCode}/edit/\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"GET\",\"path\":\"/api/v1/channels/\",\"headers\":{\"x-api-key\":\"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\"}},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"GET\",\"path\":\"/integrations/{channelCode}/checks/\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/integrations/{channelCode}/remove/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"csrfmiddlewaretoken={csrfToken}\"},\"expected\":{\"status\":302},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"GET\",\"path\":\"/integrations/{channelCode}/edit/\"},\"expected\":{\"status\":404},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/integrations/{channelCode}/test/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"csrfmiddlewaretoken={csrfToken}\"},\"expected\":{\"status\":404},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 200, \"step\": 1}, {\"content-type\": \"text/html\", \"status\": 302, \"step\": 2}, {\"content-type\": \"text/html\", \"status\": 200, \"step\": 3}, {\"content-type\": \"text/html\", \"status\": 200, \"step\": 4}, {\"content-type\": \"text/html\", \"status\": 302, \"step\": 5}, {\"content-type\": \"text/html\", \"status\": 200, \"step\": 6}, {\"content-type\": \"text/html\", \"status\": 200, \"step\": 7}, {\"error\": \"Template key 'emailCode' not found\", \"step\": 8}, {\"content-type\": \"text/html\", \"status\": 200, \"step\": 9}, {\"error\": \"Template key 'channelCode' not found\", \"step\": 10}, {\"error\": \"Template key 'channelCode' not found\", \"step\": 11}, {\"error\": \"Template key 'channelCode' not found\", \"step\": 12}, {\"body\": \"{\\\"channels\\\": [{\\\"id\\\": \\\"<UUID>\\\", \\\"kind\\\": \\\"email\\\", \\\"name\\\": \\\"email\\\"}]}\", \"content-type\": \"application/json\", \"status\": 200, \"step\": 13}, {\"error\": \"Template key 'channelCode' not found\", \"step\": 14}, {\"error\": \"Template key 'channelCode' not found\", \"step\": 15}, {\"error\": \"Template key 'channelCode' not found\", \"step\": 16}, {\"error\": \"Template key 'channelCode' not found\", \"step\": 17}]"
+  },
+  {
+    "id": "accounts_post_set_password_with_correct_current_password_returns_page",
+    "test_case": {
+      "id": "accounts_post_set_password_with_correct_current_password_returns_page",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"GET\",\"path\":\"/accounts/login/\"},\"expected\":{},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/accounts/login/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"action=login&email=alice@example.org&password=password&csrfmiddlewaretoken={csrfToken}\"},\"expected\":{\"status\":302},\"storeCookies\":{\"sessionId\":\"sessionid\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"GET\",\"path\":\"/accounts/set_password/\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{\"passCsrf\":\"csrfmiddlewaretoken\\\" value=\\\"([^\\\"]+)\\\"\"}},{\"request\":{\"method\":\"POST\",\"path\":\"/accounts/set_password/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"csrfmiddlewaretoken={passCsrf}&current_password=password&password=password&password2=password\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 200, \"step\": 1}, {\"content-type\": \"text/html\", \"status\": 302, \"step\": 2}, {\"content-type\": \"text/html\", \"status\": 200, \"step\": 3}, {\"content-type\": \"text/html\", \"status\": 302, \"step\": 4}]"
+  },
+  {
+    "id": "front_submit_add_check_with_name_over_100_chars_shows_error",
+    "test_case": {
+      "id": "front_submit_add_check_with_name_over_100_chars_shows_error",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"GET\",\"path\":\"/accounts/login/\"},\"expected\":{},\"storeCookies\":{\"nc2Csrf\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/accounts/login/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"action=login&email=alice@example.org&password=password&csrfmiddlewaretoken={nc2Csrf}\"},\"expected\":{\"status\":302},\"storeCookies\":{\"nc2Sess\":\"sessionid\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"GET\",\"path\":\"/\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{\"nc2Pid\":\"/projects/([0-9a-f-]+)/\"}},{\"request\":{\"method\":\"POST\",\"path\":\"/projects/{nc2Pid}/checks/add/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"name=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx&kind=simple&timeout=3600&grace=60&tz=UTC&csrfmiddlewaretoken={nc2Csrf}\"},\"expected\":{\"status\":403},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 200, \"step\": 1}, {\"content-type\": \"text/html\", \"status\": 302, \"step\": 2}, {\"content-type\": \"text/html\", \"status\": 200, \"step\": 3}, {\"content-type\": \"text/html\", \"status\": 404, \"step\": 4}]"
+  },
+  {
+    "id": "accounts_get_profile_shows_report_preferences_section",
+    "test_case": {
+      "id": "accounts_get_profile_shows_report_preferences_section",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"GET\",\"path\":\"/accounts/login/\"},\"expected\":{\"status\":200},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/accounts/login/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"action=login&email=alice@example.org&password=password&csrfmiddlewaretoken={csrfToken}\"},\"expected\":{\"status\":302},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"GET\",\"path\":\"/accounts/profile/notifications/\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 200, \"step\": 1}, {\"content-type\": \"text/html\", \"status\": 302, \"step\": 2}, {\"content-type\": \"text/html\", \"status\": 404, \"step\": 3}]"
+  },
+  {
+    "id": "front_get_docs_returns_200_2",
+    "test_case": {
+      "id": "front_get_docs_returns_200_2",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"GET\",\"path\":\"/docs/\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 404, \"step\": 1}]"
+  },
+  {
+    "id": "api_get_metrics_with_checks",
+    "test_case": {
+      "id": "api_get_metrics_with_checks",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"POST\",\"path\":\"/api/v1/checks/\",\"headers\":{\"content-type\":\"application/json\",\"x-api-key\":\"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\"},\"body\":\"{\\\"name\\\":\\\"Metric Check\\\",\\\"timeout\\\":3600,\\\"grace\\\":60}\"},\"expected\":{\"status\":201},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"GET\",\"path\":\"/api/v1/metrics/\"},\"expected\":{\"status\":403},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"body\": \"{\\\"badge_url\\\": \\\"http://localhost:8011/b/2/<UUID>.svg\\\", \\\"channels\\\": \\\"\\\", \\\"desc\\\": \\\"\\\", \\\"failure_kw\\\": \\\"\\\", \\\"filter_body\\\": false, \\\"filter_default_fail\\\": false, \\\"filter_http_body\\\": false, \\\"filter_subject\\\": false, \\\"grace\\\": 60, \\\"last_ping\\\": null, \\\"manual_resume\\\": false, \\\"methods\\\": \\\"\\\", \\\"n_pings\\\": 0, \\\"name\\\": \\\"Metric Check\\\", \\\"next_ping\\\": null, \\\"pause_url\\\": \\\"http://localhost:8011/api/v1/checks/<UUID>/pause\\\", \\\"ping_url\\\": \\\"http://localhost:8011/ping/<UUID>\\\", \\\"resume_url\\\": \\\"http://localhost:8011/api/v1/checks/<UUID>/resume\\\", \\\"slug\\\": \\\"metric-check\\\", \\\"start_kw\\\": \\\"\\\", \\\"started\\\": false, \\\"status\\\": \\\"new\\\", \\\"subject\\\": \\\"\\\", \\\"subject_fail\\\": \\\"\\\", \\\"success_kw\\\": \\\"\\\", \\\"tags\\\": \\\"\\\", \\\"timeout\\\": 3600, \\\"update_url\\\": \\\"http://localhost:8011/api/v1/checks/<UUID>\\\", \\\"uuid\\\": \\\"<UUID>\\\"}\", \"content-type\": \"application/json\", \"status\": 201, \"step\": 1}, {\"content-type\": \"text/html\", \"status\": 404, \"step\": 2}]"
+  },
+  {
+    "id": "front_get_ping_body_page_for_raw_body_shows_raw_content",
+    "test_case": {
+      "id": "front_get_ping_body_page_for_raw_body_shows_raw_content",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"POST\",\"path\":\"/api/v1/checks/\",\"headers\":{\"content-type\":\"application/json\",\"x-api-key\":\"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\"},\"body\":\"{\\\"name\\\":\\\"Raw Body\\\",\\\"timeout\\\":3600,\\\"grace\\\":60}\"},\"expected\":{\"status\":201},\"storeCookies\":{},\"store\":{\"rawId\":\"$.uuid\"},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/ping/{rawId}\",\"headers\":{\"content-type\":\"application/octet-stream\"},\"body\":\"raw binary data here\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"GET\",\"path\":\"/accounts/login/\"},\"expected\":{\"status\":200},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/accounts/login/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"action=login&email=alice@example.org&password=password&csrfmiddlewaretoken={csrfToken}\"},\"expected\":{\"status\":302},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"GET\",\"path\":\"/checks/{rawId}/pings/1/body/\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"body\": \"{\\\"badge_url\\\": \\\"http://localhost:8011/b/2/<UUID>.svg\\\", \\\"channels\\\": \\\"\\\", \\\"desc\\\": \\\"\\\", \\\"failure_kw\\\": \\\"\\\", \\\"filter_body\\\": false, \\\"filter_default_fail\\\": false, \\\"filter_http_body\\\": false, \\\"filter_subject\\\": false, \\\"grace\\\": 60, \\\"last_ping\\\": null, \\\"manual_resume\\\": false, \\\"methods\\\": \\\"\\\", \\\"n_pings\\\": 0, \\\"name\\\": \\\"Raw Body\\\", \\\"next_ping\\\": null, \\\"pause_url\\\": \\\"http://localhost:8011/api/v1/checks/<UUID>/pause\\\", \\\"ping_url\\\": \\\"http://localhost:8011/ping/<UUID>\\\", \\\"resume_url\\\": \\\"http://localhost:8011/api/v1/checks/<UUID>/resume\\\", \\\"slug\\\": \\\"raw-body\\\", \\\"start_kw\\\": \\\"\\\", \\\"started\\\": false, \\\"status\\\": \\\"new\\\", \\\"subject\\\": \\\"\\\", \\\"subject_fail\\\": \\\"\\\", \\\"success_kw\\\": \\\"\\\", \\\"tags\\\": \\\"\\\", \\\"timeout\\\": 3600, \\\"update_url\\\": \\\"http://localhost:8011/api/v1/checks/<UUID>\\\", \\\"uuid\\\": \\\"<UUID>\\\"}\", \"content-type\": \"application/json\", \"status\": 201, \"step\": 1}, {\"content-type\": \"text/html\", \"status\": 200, \"step\": 2}, {\"content-type\": \"text/html\", \"status\": 200, \"step\": 3}, {\"content-type\": \"text/html\", \"status\": 302, \"step\": 4}, {\"content-type\": \"text/html\", \"status\": 404, \"step\": 5}]"
+  },
+  {
+    "id": "front_post_test_for_nonexistent_channel_returns_404",
+    "test_case": {
+      "id": "front_post_test_for_nonexistent_channel_returns_404",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"GET\",\"path\":\"/accounts/login/\"},\"expected\":{},\"storeCookies\":{\"tCsrf\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/accounts/login/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"action=login&email=alice@example.org&password=password&csrfmiddlewaretoken={tCsrf}\"},\"expected\":{\"status\":302},\"storeCookies\":{\"tSess\":\"sessionid\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/integrations/00000000-0000-0000-0000-000000000000/test/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"csrfmiddlewaretoken={tCsrf}\"},\"expected\":{\"status\":403},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 200, \"step\": 1}, {\"content-type\": \"text/html\", \"status\": 302, \"step\": 2}, {\"content-type\": \"text/html\", \"status\": 404, \"step\": 3}]"
+  },
+  {
+    "id": "front_get_docssearchq_returns_empty_search_results",
+    "test_case": {
+      "id": "front_get_docssearchq_returns_empty_search_results",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"GET\",\"path\":\"/docs/search/?q=\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 404, \"step\": 1}]"
+  },
+  {
+    "id": "accounts_signup_csrf_token_can_be_used_for_signup_post",
+    "test_case": {
+      "id": "accounts_signup_csrf_token_can_be_used_for_signup_post",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"GET\",\"path\":\"/accounts/signup/csrf/\"},\"expected\":{\"status\":200},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/accounts/signup/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"identity=signup-csrf@example.org&csrfmiddlewaretoken={csrfToken}\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 200, \"step\": 1}, {\"content-type\": \"text/html\", \"status\": 302, \"step\": 2}]"
+  },
+  {
+    "id": "payments_get_project_pricing_without_auth_returns_200",
+    "test_case": {
+      "id": "payments_get_project_pricing_without_auth_returns_200",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"GET\",\"path\":\"/projects/00000000-0000-0000-0000-000000000000/pricing/\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 404, \"step\": 1}]"
+  },
+  {
+    "id": "accounts_post_profile_with_invalid_sort_value_returns_form",
+    "test_case": {
+      "id": "accounts_post_profile_with_invalid_sort_value_returns_form",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"GET\",\"path\":\"/accounts/login/\"},\"expected\":{\"status\":200},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/accounts/login/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"action=login&email=alice@example.org&password=password&csrfmiddlewaretoken={csrfToken}\"},\"expected\":{\"status\":302},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/accounts/profile/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"sort=badsort&csrfmiddlewaretoken={csrfToken}\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 200, \"step\": 1}, {\"content-type\": \"text/html\", \"status\": 302, \"step\": 2}, {\"content-type\": \"text/html\", \"status\": 404, \"step\": 3}]"
+  },
+  {
+    "id": "api_post_notification_status_with_delivered_succeeds",
+    "test_case": {
+      "id": "api_post_notification_status_with_delivered_succeeds",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"POST\",\"path\":\"/api/v1/notifications/00000000-0000-0000-0000-000000000000/status\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"MessageStatus=delivered\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 404, \"step\": 1}]"
+  },
+  {
+    "id": "accounts_get_add_totp_page_without_auth_redirects_to_login",
+    "test_case": {
+      "id": "accounts_get_add_totp_page_without_auth_redirects_to_login",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"GET\",\"path\":\"/accounts/two_factor/totp/\"},\"expected\":{\"status\":302},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 404, \"step\": 1}]"
+  },
+  {
+    "id": "accounts_get_add_project_page_without_login_redirects",
+    "test_case": {
+      "id": "accounts_get_add_project_page_without_login_redirects",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"GET\",\"path\":\"/projects/add/\"},\"expected\":{\"status\":302},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 404, \"step\": 1}]"
+  },
+  {
+    "id": "api_create_with_null_methods_returns_400",
+    "test_case": {
+      "id": "api_create_with_null_methods_returns_400",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"POST\",\"path\":\"/api/v1/checks/\",\"headers\":{\"content-type\":\"application/json\",\"x-api-key\":\"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\"},\"body\":\"{\\\"name\\\":\\\"Test\\\",\\\"timeout\\\":3600,\\\"grace\\\":60,\\\"methods\\\":null}\"},\"expected\":{\"status\":400},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"body\": \"{\\\"error\\\": \\\"json validation error: methods is not a string\\\"}\", \"content-type\": \"application/json\", \"status\": 400, \"step\": 1}]"
+  },
+  {
+    "id": "integrations_add_page_returns_404_when_disabled_4",
+    "test_case": {
+      "id": "integrations_add_page_returns_404_when_disabled_4",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"GET\",\"path\":\"/accounts/login/\"},\"expected\":{\"status\":200},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/accounts/login/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"action=login&email=alice@example.org&password=password&csrfmiddlewaretoken={csrfToken}\"},\"expected\":{\"status\":302},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"GET\",\"path\":\"/\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{\"projectCode\":\"/projects/([0-9a-f-]{36})/\"}},{\"request\":{\"method\":\"GET\",\"path\":\"/projects/{projectCode}/add_github/\"},\"expected\":{\"status\":404},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 200, \"step\": 1}, {\"content-type\": \"text/html\", \"status\": 302, \"step\": 2}, {\"content-type\": \"text/html\", \"status\": 200, \"step\": 3}, {\"content-type\": \"text/html\", \"status\": 200, \"step\": 4}]"
+  },
+  {
+    "id": "integrations_metrics_with_valid_key_returns_200",
+    "test_case": {
+      "id": "integrations_metrics_with_valid_key_returns_200",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"GET\",\"path\":\"/accounts/login/\"},\"expected\":{\"status\":200},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/accounts/login/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"action=login&email=alice@example.org&password=password&csrfmiddlewaretoken={csrfToken}\"},\"expected\":{\"status\":302},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"GET\",\"path\":\"/\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{\"projectCode\":\"/projects/([0-9a-f-]{36})/\"}},{\"request\":{\"method\":\"GET\",\"path\":\"/projects/{projectCode}/metrics/RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 200, \"step\": 1}, {\"content-type\": \"text/html\", \"status\": 302, \"step\": 2}, {\"content-type\": \"text/html\", \"status\": 200, \"step\": 3}, {\"content-type\": \"text/html\", \"status\": 404, \"step\": 4}]"
+  },
+  {
+    "id": "accounts_get_notifications_page_shows_nag_period_setting",
+    "test_case": {
+      "id": "accounts_get_notifications_page_shows_nag_period_setting",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"GET\",\"path\":\"/accounts/login/\"},\"expected\":{\"status\":200},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/accounts/login/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"action=login&email=alice@example.org&password=password&csrfmiddlewaretoken={csrfToken}\"},\"expected\":{\"status\":302},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"GET\",\"path\":\"/accounts/profile/notifications/\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 200, \"step\": 1}, {\"content-type\": \"text/html\", \"status\": 302, \"step\": 2}, {\"content-type\": \"text/html\", \"status\": 404, \"step\": 3}]"
+  },
+  {
+    "id": "api_post_to_flips_endpoint_returns_405",
+    "test_case": {
+      "id": "api_post_to_flips_endpoint_returns_405",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"POST\",\"path\":\"/api/v1/checks/00000000-0000-0000-0000-000000000000/flips/\"},\"expected\":{\"status\":405},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 404, \"step\": 1}]"
+  },
+  {
+    "id": "api_list_flips_with_wrong_api_key_returns_401",
+    "test_case": {
+      "id": "api_list_flips_with_wrong_api_key_returns_401",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"GET\",\"path\":\"/api/v1/checks/00000000-0000-0000-0000-000000000000/flips/\",\"headers\":{\"x-api-key\":\"wrong\"}},\"expected\":{\"status\":401},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 404, \"step\": 1}]"
+  },
+  {
+    "id": "api_get_status_returns_ok",
+    "test_case": {
+      "id": "api_get_status_returns_ok",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"GET\",\"path\":\"/api/v1/status/\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 404, \"step\": 1}]"
+  },
+  {
+    "id": "accounts_get_add_totp_when_logged_in_shows_form",
+    "test_case": {
+      "id": "accounts_get_add_totp_when_logged_in_shows_form",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"GET\",\"path\":\"/accounts/login/\"},\"expected\":{\"status\":200},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/accounts/login/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"action=login&email=alice@example.org&password=password&csrfmiddlewaretoken={csrfToken}\"},\"expected\":{\"status\":302},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"GET\",\"path\":\"/accounts/two_factor/totp/\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 200, \"step\": 1}, {\"content-type\": \"text/html\", \"status\": 302, \"step\": 2}, {\"content-type\": \"text/html\", \"status\": 404, \"step\": 3}]"
+  },
+  {
+    "id": "accounts_get_notifications_without_login_redirects",
+    "test_case": {
+      "id": "accounts_get_notifications_without_login_redirects",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"GET\",\"path\":\"/accounts/profile/notifications/\"},\"expected\":{\"status\":302},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 404, \"step\": 1}]"
+  },
+  {
+    "id": "front_add_email_channel_with_email_over_100_chars_shows_error",
+    "test_case": {
+      "id": "front_add_email_channel_with_email_over_100_chars_shows_error",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"GET\",\"path\":\"/accounts/login/\"},\"expected\":{},\"storeCookies\":{\"nc2Csrf\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/accounts/login/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"action=login&email=alice@example.org&password=password&csrfmiddlewaretoken={nc2Csrf}\"},\"expected\":{\"status\":302},\"storeCookies\":{\"nc2Sess\":\"sessionid\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"GET\",\"path\":\"/\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{\"nc2Pid\":\"/projects/([0-9a-f-]+)/\"}},{\"request\":{\"method\":\"GET\",\"path\":\"/projects/{nc2Pid}/add_email/\"},\"expected\":{\"status\":200},\"storeCookies\":{\"nc2Csrf2\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/projects/{nc2Pid}/add_email/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"value=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx%40example.org&down=true&up=true&csrfmiddlewaretoken={nc2Csrf2}\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 200, \"step\": 1}, {\"content-type\": \"text/html\", \"status\": 302, \"step\": 2}, {\"content-type\": \"text/html\", \"status\": 200, \"step\": 3}, {\"content-type\": \"text/html\", \"status\": 200, \"step\": 4}, {\"content-type\": \"text/html\", \"status\": 302, \"step\": 5}]"
+  },
+  {
+    "id": "api_ping_with_empty_rid_param_returns_400",
+    "test_case": {
+      "id": "api_ping_with_empty_rid_param_returns_400",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"POST\",\"path\":\"/api/v1/checks/\",\"headers\":{\"content-type\":\"application/json\",\"x-api-key\":\"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\"},\"body\":\"{\\\"name\\\":\\\"Rid Empty\\\",\\\"timeout\\\":3600,\\\"grace\\\":60}\"},\"expected\":{\"status\":201},\"storeCookies\":{},\"store\":{\"ridEmptyId\":\"$.uuid\"},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/ping/{ridEmptyId}/?rid=\"},\"expected\":{\"status\":400},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"body\": \"{\\\"badge_url\\\": \\\"http://localhost:8011/b/2/<UUID>.svg\\\", \\\"channels\\\": \\\"\\\", \\\"desc\\\": \\\"\\\", \\\"failure_kw\\\": \\\"\\\", \\\"filter_body\\\": false, \\\"filter_default_fail\\\": false, \\\"filter_http_body\\\": false, \\\"filter_subject\\\": false, \\\"grace\\\": 60, \\\"last_ping\\\": null, \\\"manual_resume\\\": false, \\\"methods\\\": \\\"\\\", \\\"n_pings\\\": 0, \\\"name\\\": \\\"Rid Empty\\\", \\\"next_ping\\\": null, \\\"pause_url\\\": \\\"http://localhost:8011/api/v1/checks/<UUID>/pause\\\", \\\"ping_url\\\": \\\"http://localhost:8011/ping/<UUID>\\\", \\\"resume_url\\\": \\\"http://localhost:8011/api/v1/checks/<UUID>/resume\\\", \\\"slug\\\": \\\"rid-empty\\\", \\\"start_kw\\\": \\\"\\\", \\\"started\\\": false, \\\"status\\\": \\\"new\\\", \\\"subject\\\": \\\"\\\", \\\"subject_fail\\\": \\\"\\\", \\\"success_kw\\\": \\\"\\\", \\\"tags\\\": \\\"\\\", \\\"timeout\\\": 3600, \\\"update_url\\\": \\\"http://localhost:8011/api/v1/checks/<UUID>\\\", \\\"uuid\\\": \\\"<UUID>\\\"}\", \"content-type\": \"application/json\", \"status\": 201, \"step\": 1}, {\"content-type\": \"text/html\", \"status\": 200, \"step\": 2}]"
+  },
+  {
+    "id": "front_get_project_badges_page_returns_200",
+    "test_case": {
+      "id": "front_get_project_badges_page_returns_200",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"GET\",\"path\":\"/accounts/login/\"},\"expected\":{},\"storeCookies\":{\"pbCsrf\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/accounts/login/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"action=login&email=alice@example.org&password=password&csrfmiddlewaretoken={pbCsrf}\"},\"expected\":{\"status\":302},\"storeCookies\":{\"pbSess\":\"sessionid\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"GET\",\"path\":\"/\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{\"pbPid\":\"/projects/([0-9a-f-]+)/\"}},{\"request\":{\"method\":\"GET\",\"path\":\"/projects/{pbPid}/badges/\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 200, \"step\": 1}, {\"content-type\": \"text/html\", \"status\": 302, \"step\": 2}, {\"content-type\": \"text/html\", \"status\": 200, \"step\": 3}, {\"content-type\": \"text/html\", \"status\": 404, \"step\": 4}]"
+  },
+  {
+    "id": "accounts_get_appearance_without_login_redirects",
+    "test_case": {
+      "id": "accounts_get_appearance_without_login_redirects",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"GET\",\"path\":\"/accounts/profile/appearance/\"},\"expected\":{\"status\":302},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 404, \"step\": 1}]"
+  },
+  {
+    "id": "front_post_remove_for_nonexistent_channel_returns_404",
+    "test_case": {
+      "id": "front_post_remove_for_nonexistent_channel_returns_404",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"GET\",\"path\":\"/accounts/login/\"},\"expected\":{},\"storeCookies\":{\"rCsrf\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/accounts/login/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"action=login&email=alice@example.org&password=password&csrfmiddlewaretoken={rCsrf}\"},\"expected\":{\"status\":302},\"storeCookies\":{\"rSess\":\"sessionid\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/integrations/00000000-0000-0000-0000-000000000000/remove/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"csrfmiddlewaretoken={rCsrf}\"},\"expected\":{\"status\":403},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 200, \"step\": 1}, {\"content-type\": \"text/html\", \"status\": 302, \"step\": 2}, {\"content-type\": \"text/html\", \"status\": 404, \"step\": 3}]"
+  },
+  {
+    "id": "accounts_post_signup_with_team_invitation_code_handled",
+    "test_case": {
+      "id": "accounts_post_signup_with_team_invitation_code_handled",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"GET\",\"path\":\"/accounts/signup/csrf/\"},\"expected\":{\"status\":200},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/accounts/signup/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"identity=teamsignup%40test.org&password=password123&csrfmiddlewaretoken={csrfToken}\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 200, \"step\": 1}, {\"content-type\": \"text/html\", \"status\": 302, \"step\": 2}]"
+  },
+  {
+    "id": "integrations_add_page_returns_404_when_disabled",
+    "test_case": {
+      "id": "integrations_add_page_returns_404_when_disabled",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"GET\",\"path\":\"/accounts/login/\"},\"expected\":{\"status\":200},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/accounts/login/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"action=login&email=alice@example.org&password=password&csrfmiddlewaretoken={csrfToken}\"},\"expected\":{\"status\":302},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"GET\",\"path\":\"/\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{\"projectCode\":\"/projects/([0-9a-f-]{36})/\"}},{\"request\":{\"method\":\"GET\",\"path\":\"/projects/{projectCode}/add_apprise/\"},\"expected\":{\"status\":404},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 200, \"step\": 1}, {\"content-type\": \"text/html\", \"status\": 302, \"step\": 2}, {\"content-type\": \"text/html\", \"status\": 200, \"step\": 3}, {\"content-type\": \"text/html\", \"status\": 200, \"step\": 4}]"
+  },
+  {
+    "id": "accounts_get_project_settings_page_when_logged_in_returns_200",
+    "test_case": {
+      "id": "accounts_get_project_settings_page_when_logged_in_returns_200",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"GET\",\"path\":\"/accounts/login/\"},\"expected\":{},\"storeCookies\":{\"pCsrf\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/accounts/login/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"action=login&email=alice@example.org&password=password&csrfmiddlewaretoken={pCsrf}\"},\"expected\":{\"status\":302},\"storeCookies\":{\"pSess\":\"sessionid\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"GET\",\"path\":\"/\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{\"projId\":\"/projects/([0-9a-f-]+)/\"}},{\"request\":{\"method\":\"GET\",\"path\":\"/projects/{projId}/settings/\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 200, \"step\": 1}, {\"content-type\": \"text/html\", \"status\": 302, \"step\": 2}, {\"content-type\": \"text/html\", \"status\": 200, \"step\": 3}, {\"content-type\": \"text/html\", \"status\": 404, \"step\": 4}]"
+  },
+  {
+    "id": "accounts_signup_csrf_while_authenticated_returns_403",
+    "test_case": {
+      "id": "accounts_signup_csrf_while_authenticated_returns_403",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"GET\",\"path\":\"/accounts/login/\"},\"expected\":{\"status\":200},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/accounts/login/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"action=login&email=alice@example.org&password=password&csrfmiddlewaretoken={csrfToken}\"},\"expected\":{\"status\":302},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"GET\",\"path\":\"/accounts/signup/csrf/\"},\"expected\":{\"status\":403},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 200, \"step\": 1}, {\"content-type\": \"text/html\", \"status\": 302, \"step\": 2}, {\"content-type\": \"text/html\", \"status\": 200, \"step\": 3}]"
+  },
+  {
+    "id": "front_post_cron_preview_with_invalid_expression_and_csrf",
+    "test_case": {
+      "id": "front_post_cron_preview_with_invalid_expression_and_csrf",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"GET\",\"path\":\"/accounts/login/\"},\"expected\":{\"status\":200},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/checks/cron_preview/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"schedule=bad-expr&tz=UTC&csrfmiddlewaretoken={csrfToken}\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 200, \"step\": 1}, {\"content-type\": \"text/html\", \"status\": 404, \"step\": 2}]"
+  },
+  {
+    "id": "accounts_get_check_token_with_invalid_token_shows_submit_form",
+    "test_case": {
+      "id": "accounts_get_check_token_with_invalid_token_shows_submit_form",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"GET\",\"path\":\"/accounts/check_token/alice/invalid-token/\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 404, \"step\": 1}]"
+  },
+  {
+    "id": "api_subject_201_chars_400",
+    "test_case": {
+      "id": "api_subject_201_chars_400",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"POST\",\"path\":\"/api/v1/checks/\",\"headers\":{\"content-type\":\"application/json\",\"x-api-key\":\"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\"},\"body\":\"{\\\"name\\\":\\\"Test\\\",\\\"subject\\\":\\\"xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\\\",\\\"timeout\\\":3600,\\\"grace\\\":60}\"},\"expected\":{\"status\":400},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"body\": \"{\\\"badge_url\\\": \\\"http://localhost:8011/b/2/<UUID>.svg\\\", \\\"channels\\\": \\\"\\\", \\\"desc\\\": \\\"\\\", \\\"failure_kw\\\": \\\"\\\", \\\"filter_body\\\": false, \\\"filter_default_fail\\\": false, \\\"filter_http_body\\\": false, \\\"filter_subject\\\": true, \\\"grace\\\": 60, \\\"last_ping\\\": null, \\\"manual_resume\\\": false, \\\"methods\\\": \\\"\\\", \\\"n_pings\\\": 0, \\\"name\\\": \\\"Test\\\", \\\"next_ping\\\": null, \\\"pause_url\\\": \\\"http://localhost:8011/api/v1/checks/<UUID>/pause\\\", \\\"ping_url\\\": \\\"http://localhost:8011/ping/<UUID>\\\", \\\"resume_url\\\": \\\"http://localhost:8011/api/v1/checks/<UUID>/resume\\\", \\\"slug\\\": \\\"test\\\", \\\"start_kw\\\": \\\"\\\", \\\"started\\\": false, \\\"status\\\": \\\"new\\\", \\\"subject\\\": \\\"<TOKEN>\\\", \\\"subject_fail\\\": \\\"\\\", \\\"success_kw\\\": \\\"<TOKEN>\\\", \\\"tags\\\": \\\"\\\", \\\"timeout\\\": 3600, \\\"update_url\\\": \\\"http://localhost:8011/api/v1/checks/<UUID>\\\", \\\"uuid\\\": \\\"<UUID>\\\"}\", \"content-type\": \"application/json\", \"status\": 201, \"step\": 1}]"
+  },
+  {
+    "id": "front_get_switch_channel_without_auth_redirects",
+    "test_case": {
+      "id": "front_get_switch_channel_without_auth_redirects",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"GET\",\"path\":\"/checks/00000000-0000-0000-0000-000000000000/channels/00000000-0000-0000-0000-000000000000/enabled\"},\"expected\":{\"status\":302},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 404, \"step\": 1}]"
+  },
+  {
+    "id": "accounts_post_signup_with_email_exceeding_254_chars_returns_error",
+    "test_case": {
+      "id": "accounts_post_signup_with_email_exceeding_254_chars_returns_error",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"GET\",\"path\":\"/accounts/signup/csrf/\"},\"expected\":{\"status\":200},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/accounts/signup/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"identity=xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx@example.org&csrfmiddlewaretoken={csrfToken}\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 200, \"step\": 1}, {\"content-type\": \"text/html\", \"status\": 302, \"step\": 2}]"
+  },
+  {
+    "id": "front_get_last_ping_details_returns_200",
+    "test_case": {
+      "id": "front_get_last_ping_details_returns_200",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"GET\",\"path\":\"/accounts/login/\"},\"expected\":{},\"storeCookies\":{\"pdCsrf\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/accounts/login/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"action=login&email=alice@example.org&password=password&csrfmiddlewaretoken={pdCsrf}\"},\"expected\":{\"status\":302},\"storeCookies\":{\"pdSess\":\"sessionid\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/api/v1/checks/\",\"headers\":{\"content-type\":\"application/json\",\"x-api-key\":\"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\"},\"body\":\"{\\\"name\\\":\\\"Ping Detail\\\",\\\"timeout\\\":3600,\\\"grace\\\":60}\"},\"expected\":{\"status\":201},\"storeCookies\":{},\"store\":{\"pdCheckId\":\"$.uuid\"},\"storeHtml\":{}},{\"request\":{\"method\":\"GET\",\"path\":\"/checks/{pdCheckId}/last_ping/\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 200, \"step\": 1}, {\"content-type\": \"text/html\", \"status\": 302, \"step\": 2}, {\"body\": \"{\\\"badge_url\\\": \\\"http://localhost:8011/b/2/<UUID>.svg\\\", \\\"channels\\\": \\\"\\\", \\\"desc\\\": \\\"\\\", \\\"failure_kw\\\": \\\"\\\", \\\"filter_body\\\": false, \\\"filter_default_fail\\\": false, \\\"filter_http_body\\\": false, \\\"filter_subject\\\": false, \\\"grace\\\": 60, \\\"last_ping\\\": null, \\\"manual_resume\\\": false, \\\"methods\\\": \\\"\\\", \\\"n_pings\\\": 0, \\\"name\\\": \\\"Ping Detail\\\", \\\"next_ping\\\": null, \\\"pause_url\\\": \\\"http://localhost:8011/api/v1/checks/<UUID>/pause\\\", \\\"ping_url\\\": \\\"http://localhost:8011/ping/<UUID>\\\", \\\"resume_url\\\": \\\"http://localhost:8011/api/v1/checks/<UUID>/resume\\\", \\\"slug\\\": \\\"ping-detail\\\", \\\"start_kw\\\": \\\"\\\", \\\"started\\\": false, \\\"status\\\": \\\"new\\\", \\\"subject\\\": \\\"\\\", \\\"subject_fail\\\": \\\"\\\", \\\"success_kw\\\": \\\"\\\", \\\"tags\\\": \\\"\\\", \\\"timeout\\\": 3600, \\\"update_url\\\": \\\"http://localhost:8011/api/v1/checks/<UUID>\\\", \\\"uuid\\\": \\\"<UUID>\\\"}\", \"content-type\": \"application/json\", \"status\": 201, \"step\": 3}, {\"content-type\": \"text/html\", \"status\": 404, \"step\": 4}]"
+  },
+  {
+    "id": "integrations_channel_lifecycle_create_test_rename_checks_remove_verify_gone_3",
+    "test_case": {
+      "id": "integrations_channel_lifecycle_create_test_rename_checks_remove_verify_gone_3",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"GET\",\"path\":\"/accounts/login/\"},\"expected\":{\"status\":200},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/accounts/login/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"action=login&email=alice@example.org&password=password&csrfmiddlewaretoken={csrfToken}\"},\"expected\":{\"status\":302},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"GET\",\"path\":\"/\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{\"projectCode\":\"/projects/([0-9a-f-]{36})/\"}},{\"request\":{\"method\":\"GET\",\"path\":\"/projects/{projectCode}/add_slack/\"},\"expected\":{\"status\":200},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/projects/{projectCode}/add_slack/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"value=https://hooks.example.com/lifecycle&csrfmiddlewaretoken={csrfToken}\"},\"expected\":{\"status\":302},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"GET\",\"path\":\"/projects/{projectCode}/integrations/\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{\"channelCode\":\"/integrations/([0-9a-f-]{36})/\"}},{\"request\":{\"method\":\"POST\",\"path\":\"/integrations/{channelCode}/test/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"csrfmiddlewaretoken={csrfToken}\"},\"expected\":{\"status\":302},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/integrations/{channelCode}/name/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"name=Renamed+Slack&csrfmiddlewaretoken={csrfToken}\"},\"expected\":{\"status\":302},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"GET\",\"path\":\"/api/v1/channels/\",\"headers\":{\"x-api-key\":\"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\"}},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"GET\",\"path\":\"/integrations/{channelCode}/checks/\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/integrations/{channelCode}/remove/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"csrfmiddlewaretoken={csrfToken}\"},\"expected\":{\"status\":302},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"GET\",\"path\":\"/integrations/{channelCode}/edit/\"},\"expected\":{\"status\":404},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/integrations/{channelCode}/test/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"csrfmiddlewaretoken={csrfToken}\"},\"expected\":{\"status\":404},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 200, \"step\": 1}, {\"content-type\": \"text/html\", \"status\": 302, \"step\": 2}, {\"content-type\": \"text/html\", \"status\": 200, \"step\": 3}, {\"content-type\": \"text/html\", \"status\": 200, \"step\": 4}, {\"content-type\": \"text/html\", \"status\": 302, \"step\": 5}, {\"content-type\": \"text/html\", \"status\": 200, \"step\": 6}, {\"error\": \"Template key 'channelCode' not found\", \"step\": 7}, {\"error\": \"Template key 'channelCode' not found\", \"step\": 8}, {\"body\": \"{\\\"channels\\\": [{\\\"id\\\": \\\"<UUID>\\\", \\\"kind\\\": \\\"slack\\\", \\\"name\\\": \\\"slack\\\"}]}\", \"content-type\": \"application/json\", \"status\": 200, \"step\": 9}, {\"error\": \"Template key 'channelCode' not found\", \"step\": 10}, {\"error\": \"Template key 'channelCode' not found\", \"step\": 11}, {\"error\": \"Template key 'channelCode' not found\", \"step\": 12}, {\"error\": \"Template key 'channelCode' not found\", \"step\": 13}]"
+  },
+  {
+    "id": "front_get_uncloak_without_login_redirects",
+    "test_case": {
+      "id": "front_get_uncloak_without_login_redirects",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"GET\",\"path\":\"/cloaked/0000000000000000000000000000000000000000/\"},\"expected\":{\"status\":302},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 404, \"step\": 1}]"
+  },
+  {
+    "id": "front_post_update_timeout_redirects",
+    "test_case": {
+      "id": "front_post_update_timeout_redirects",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"GET\",\"path\":\"/accounts/login/\"},\"expected\":{},\"storeCookies\":{\"utCsrf\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/accounts/login/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"action=login&email=alice@example.org&password=password&csrfmiddlewaretoken={utCsrf}\"},\"expected\":{\"status\":302},\"storeCookies\":{\"utSess\":\"sessionid\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/api/v1/checks/\",\"headers\":{\"content-type\":\"application/json\",\"x-api-key\":\"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\"},\"body\":\"{\\\"name\\\":\\\"Timeout Update\\\",\\\"timeout\\\":3600,\\\"grace\\\":60}\"},\"expected\":{\"status\":201},\"storeCookies\":{},\"store\":{\"utCheckId\":\"$.uuid\"},\"storeHtml\":{}},{\"request\":{\"method\":\"GET\",\"path\":\"/checks/{utCheckId}/details/\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{\"utCsrfToken\":\"csrfmiddlewaretoken\\\" value=\\\"([^\\\"]+)\\\"\"}},{\"request\":{\"method\":\"POST\",\"path\":\"/checks/{utCheckId}/timeout/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"csrfmiddlewaretoken={utCsrfToken}&kind=simple&timeout=7200&grace=120\"},\"expected\":{\"status\":302},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 200, \"step\": 1}, {\"content-type\": \"text/html\", \"status\": 302, \"step\": 2}, {\"body\": \"{\\\"badge_url\\\": \\\"http://localhost:8011/b/2/<UUID>.svg\\\", \\\"channels\\\": \\\"\\\", \\\"desc\\\": \\\"\\\", \\\"failure_kw\\\": \\\"\\\", \\\"filter_body\\\": false, \\\"filter_default_fail\\\": false, \\\"filter_http_body\\\": false, \\\"filter_subject\\\": false, \\\"grace\\\": 60, \\\"last_ping\\\": null, \\\"manual_resume\\\": false, \\\"methods\\\": \\\"\\\", \\\"n_pings\\\": 0, \\\"name\\\": \\\"Timeout Update\\\", \\\"next_ping\\\": null, \\\"pause_url\\\": \\\"http://localhost:8011/api/v1/checks/<UUID>/pause\\\", \\\"ping_url\\\": \\\"http://localhost:8011/ping/<UUID>\\\", \\\"resume_url\\\": \\\"http://localhost:8011/api/v1/checks/<UUID>/resume\\\", \\\"slug\\\": \\\"timeout-update\\\", \\\"start_kw\\\": \\\"\\\", \\\"started\\\": false, \\\"status\\\": \\\"new\\\", \\\"subject\\\": \\\"\\\", \\\"subject_fail\\\": \\\"\\\", \\\"success_kw\\\": \\\"\\\", \\\"tags\\\": \\\"\\\", \\\"timeout\\\": 3600, \\\"update_url\\\": \\\"http://localhost:8011/api/v1/checks/<UUID>\\\", \\\"uuid\\\": \\\"<UUID>\\\"}\", \"content-type\": \"application/json\", \"status\": 201, \"step\": 3}, {\"content-type\": \"text/html\", \"status\": 200, \"step\": 4}, {\"content-type\": \"text/html\", \"status\": 404, \"step\": 5}]"
+  },
+  {
+    "id": "api_create_with_channels_non_string_returns_400",
+    "test_case": {
+      "id": "api_create_with_channels_non_string_returns_400",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"POST\",\"path\":\"/api/v1/checks/\",\"headers\":{\"content-type\":\"application/json\",\"x-api-key\":\"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\"},\"body\":\"{\\\"name\\\":\\\"Test\\\",\\\"timeout\\\":3600,\\\"grace\\\":60,\\\"channels\\\":123}\"},\"expected\":{\"status\":400},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"body\": \"{\\\"badge_url\\\": \\\"http://localhost:8011/b/2/<UUID>.svg\\\", \\\"channels\\\": \\\"\\\", \\\"desc\\\": \\\"\\\", \\\"failure_kw\\\": \\\"\\\", \\\"filter_body\\\": false, \\\"filter_default_fail\\\": false, \\\"filter_http_body\\\": false, \\\"filter_subject\\\": false, \\\"grace\\\": 60, \\\"last_ping\\\": null, \\\"manual_resume\\\": false, \\\"methods\\\": \\\"\\\", \\\"n_pings\\\": 0, \\\"name\\\": \\\"Test\\\", \\\"next_ping\\\": null, \\\"pause_url\\\": \\\"http://localhost:8011/api/v1/checks/<UUID>/pause\\\", \\\"ping_url\\\": \\\"http://localhost:8011/ping/<UUID>\\\", \\\"resume_url\\\": \\\"http://localhost:8011/api/v1/checks/<UUID>/resume\\\", \\\"slug\\\": \\\"test\\\", \\\"start_kw\\\": \\\"\\\", \\\"started\\\": false, \\\"status\\\": \\\"new\\\", \\\"subject\\\": \\\"\\\", \\\"subject_fail\\\": \\\"\\\", \\\"success_kw\\\": \\\"\\\", \\\"tags\\\": \\\"\\\", \\\"timeout\\\": 3600, \\\"update_url\\\": \\\"http://localhost:8011/api/v1/checks/<UUID>\\\", \\\"uuid\\\": \\\"<UUID>\\\"}\", \"content-type\": \"application/json\", \"status\": 201, \"step\": 1}]"
+  },
+  {
+    "id": "front_get_docs_returns_200",
+    "test_case": {
+      "id": "front_get_docs_returns_200",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"GET\",\"path\":\"/docs/\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 404, \"step\": 1}]"
+  },
+  {
+    "id": "payments_get_project_pricing_when_authenticated_renders_upgrade",
+    "test_case": {
+      "id": "payments_get_project_pricing_when_authenticated_renders_upgrade",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"GET\",\"path\":\"/accounts/login/\"},\"expected\":{\"status\":200},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/accounts/login/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"action=login&email=alice@example.org&password=password&csrfmiddlewaretoken={csrfToken}\"},\"expected\":{\"status\":302},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"GET\",\"path\":\"/\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{\"pcode\":\"/projects/([0-9a-f-]{36})/\"}},{\"request\":{\"method\":\"GET\",\"path\":\"/projects/{pcode}/pricing/\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 200, \"step\": 1}, {\"content-type\": \"text/html\", \"status\": 302, \"step\": 2}, {\"content-type\": \"text/html\", \"status\": 200, \"step\": 3}, {\"content-type\": \"text/html\", \"status\": 404, \"step\": 4}]"
+  },
+  {
+    "id": "api_list_flips_for_check_returns_empty_initially",
+    "test_case": {
+      "id": "api_list_flips_for_check_returns_empty_initially",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"POST\",\"path\":\"/api/v1/checks/\",\"headers\":{\"content-type\":\"application/json\",\"x-api-key\":\"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\"},\"body\":\"{\\\"name\\\":\\\"Flips Check\\\",\\\"timeout\\\":3600,\\\"grace\\\":60}\"},\"expected\":{\"status\":201},\"storeCookies\":{},\"store\":{\"flipsId\":\"$.uuid\"},\"storeHtml\":{}},{\"request\":{\"method\":\"GET\",\"path\":\"/api/v1/checks/{flipsId}/flips/\",\"headers\":{\"x-api-key\":\"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\"}},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"body\": \"{\\\"badge_url\\\": \\\"http://localhost:8011/b/2/<UUID>.svg\\\", \\\"channels\\\": \\\"\\\", \\\"desc\\\": \\\"\\\", \\\"failure_kw\\\": \\\"\\\", \\\"filter_body\\\": false, \\\"filter_default_fail\\\": false, \\\"filter_http_body\\\": false, \\\"filter_subject\\\": false, \\\"grace\\\": 60, \\\"last_ping\\\": null, \\\"manual_resume\\\": false, \\\"methods\\\": \\\"\\\", \\\"n_pings\\\": 0, \\\"name\\\": \\\"Flips Check\\\", \\\"next_ping\\\": null, \\\"pause_url\\\": \\\"http://localhost:8011/api/v1/checks/<UUID>/pause\\\", \\\"ping_url\\\": \\\"http://localhost:8011/ping/<UUID>\\\", \\\"resume_url\\\": \\\"http://localhost:8011/api/v1/checks/<UUID>/resume\\\", \\\"slug\\\": \\\"flips-check\\\", \\\"start_kw\\\": \\\"\\\", \\\"started\\\": false, \\\"status\\\": \\\"new\\\", \\\"subject\\\": \\\"\\\", \\\"subject_fail\\\": \\\"\\\", \\\"success_kw\\\": \\\"\\\", \\\"tags\\\": \\\"\\\", \\\"timeout\\\": 3600, \\\"update_url\\\": \\\"http://localhost:8011/api/v1/checks/<UUID>\\\", \\\"uuid\\\": \\\"<UUID>\\\"}\", \"content-type\": \"application/json\", \"status\": 201, \"step\": 1}, {\"content-type\": \"text/html\", \"status\": 404, \"step\": 2}]"
+  },
+  {
+    "id": "front_get_tv_dashboard_returns_200",
+    "test_case": {
+      "id": "front_get_tv_dashboard_returns_200",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"GET\",\"path\":\"/tv/\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 404, \"step\": 1}]"
+  },
+  {
+    "id": "api_flips_by_unique_key_returns_empty_initially",
+    "test_case": {
+      "id": "api_flips_by_unique_key_returns_empty_initially",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"POST\",\"path\":\"/api/v1/checks/\",\"headers\":{\"content-type\":\"application/json\",\"x-api-key\":\"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\"},\"body\":\"{\\\"name\\\":\\\"Flip By Key\\\",\\\"timeout\\\":3600,\\\"grace\\\":60}\"},\"expected\":{\"status\":201},\"storeCookies\":{},\"store\":{\"fbkId\":\"$.uuid\"},\"storeHtml\":{}},{\"request\":{\"method\":\"GET\",\"path\":\"/api/v1/checks/{fbkId}/flips/\",\"headers\":{\"x-api-key\":\"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\"}},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"body\": \"{\\\"badge_url\\\": \\\"http://localhost:8011/b/2/<UUID>.svg\\\", \\\"channels\\\": \\\"\\\", \\\"desc\\\": \\\"\\\", \\\"failure_kw\\\": \\\"\\\", \\\"filter_body\\\": false, \\\"filter_default_fail\\\": false, \\\"filter_http_body\\\": false, \\\"filter_subject\\\": false, \\\"grace\\\": 60, \\\"last_ping\\\": null, \\\"manual_resume\\\": false, \\\"methods\\\": \\\"\\\", \\\"n_pings\\\": 0, \\\"name\\\": \\\"Flip By Key\\\", \\\"next_ping\\\": null, \\\"pause_url\\\": \\\"http://localhost:8011/api/v1/checks/<UUID>/pause\\\", \\\"ping_url\\\": \\\"http://localhost:8011/ping/<UUID>\\\", \\\"resume_url\\\": \\\"http://localhost:8011/api/v1/checks/<UUID>/resume\\\", \\\"slug\\\": \\\"flip-by-key\\\", \\\"start_kw\\\": \\\"\\\", \\\"started\\\": false, \\\"status\\\": \\\"new\\\", \\\"subject\\\": \\\"\\\", \\\"subject_fail\\\": \\\"\\\", \\\"success_kw\\\": \\\"\\\", \\\"tags\\\": \\\"\\\", \\\"timeout\\\": 3600, \\\"update_url\\\": \\\"http://localhost:8011/api/v1/checks/<UUID>\\\", \\\"uuid\\\": \\\"<UUID>\\\"}\", \"content-type\": \"application/json\", \"status\": 201, \"step\": 1}, {\"content-type\": \"text/html\", \"status\": 404, \"step\": 2}]"
+  },
+  {
+    "id": "integrations_add_channel_for_whatsapp_with_minimal_label",
+    "test_case": {
+      "id": "integrations_add_channel_for_whatsapp_with_minimal_label",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"GET\",\"path\":\"/accounts/login/\"},\"expected\":{\"status\":200},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/accounts/login/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"action=login&email=alice@example.org&password=password&csrfmiddlewaretoken={csrfToken}\"},\"expected\":{\"status\":302},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"GET\",\"path\":\"/\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{\"pcode\":\"/projects/([0-9a-f-]{36})/\"}},{\"request\":{\"method\":\"GET\",\"path\":\"/projects/{pcode}/add_whatsapp/\"},\"expected\":{\"status\":404},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 200, \"step\": 1}, {\"content-type\": \"text/html\", \"status\": 302, \"step\": 2}, {\"content-type\": \"text/html\", \"status\": 200, \"step\": 3}, {\"content-type\": \"text/html\", \"status\": 200, \"step\": 4}]"
+  },
+  {
+    "id": "payments_get_project_pricing_with_uuid_returns_200",
+    "test_case": {
+      "id": "payments_get_project_pricing_with_uuid_returns_200",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"GET\",\"path\":\"/projects/00000000-0000-0000-0000-000000000000/pricing/\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 404, \"step\": 1}]"
+  },
+  {
+    "id": "api_post_notification_status_for_nonexistent_notification_returns_404",
+    "test_case": {
+      "id": "api_post_notification_status_for_nonexistent_notification_returns_404",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"POST\",\"path\":\"/api/v1/notifications/00000000-0000-0000-0000-000000000000/status\",\"headers\":{\"content-type\":\"application/json\"},\"body\":\"{\\\"status\\\":\\\"delivered\\\"}\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 404, \"step\": 1}]"
+  },
+  {
+    "id": "integrations_add_page_returns_404_when_disabled_12",
+    "test_case": {
+      "id": "integrations_add_page_returns_404_when_disabled_12",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"GET\",\"path\":\"/accounts/login/\"},\"expected\":{\"status\":200},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"POST\",\"path\":\"/accounts/login/\",\"headers\":{\"content-type\":\"application/x-www-form-urlencoded\"},\"body\":\"action=login&email=alice@example.org&password=password&csrfmiddlewaretoken={csrfToken}\"},\"expected\":{\"status\":302},\"storeCookies\":{\"csrfToken\":\"csrftoken\"},\"store\":{},\"storeHtml\":{}},{\"request\":{\"method\":\"GET\",\"path\":\"/\"},\"expected\":{\"status\":200},\"storeCookies\":{},\"store\":{},\"storeHtml\":{\"projectCode\":\"/projects/([0-9a-f-]{36})/\"}},{\"request\":{\"method\":\"GET\",\"path\":\"/projects/{projectCode}/add_whatsapp/\"},\"expected\":{\"status\":404},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"content-type\": \"text/html\", \"status\": 200, \"step\": 1}, {\"content-type\": \"text/html\", \"status\": 302, \"step\": 2}, {\"content-type\": \"text/html\", \"status\": 200, \"step\": 3}, {\"content-type\": \"text/html\", \"status\": 200, \"step\": 4}]"
+  }
+]
