@@ -1,12 +1,6 @@
-# marked
+# marked (Python Implementation)
 
-Markdown to HTML processor.
-
-| Field | Value |
-|-------|-------|
-| **Type** | Medium |
-| **Score** | 400 |
-| **Reference** | JavaScript |
+This is the Python port of the `marked` Markdown-to-HTML parser.
 
 ## Prerequisites
 
@@ -38,7 +32,3 @@ cd relang && python3 -X utf8 validate.py "python3 -X utf8 ../target/main.py"
 source ../setup.sh
 relang "python3 target/main.py"
 ```
-
-> ⚠️ **Do NOT submit the source reference implementation.**  
-> Only implement and submit your code from `target/`.  
-> Submitting `source/` may result in **disqualification**.
