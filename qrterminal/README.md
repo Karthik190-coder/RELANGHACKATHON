@@ -11,8 +11,19 @@ QR code generator for the terminal. Faithful C# port of the Go reference impleme
 
 ## Prerequisites
 
-- .NET 8 SDK (for development / `dotnet run`)
-- OR: use the self-contained Linux binary from `target/publish/QrTerminal.Cli`
+### For building/running via dotnet CLI (Ubuntu 24.04 / Linux):
+You can install the .NET 8 SDK directly from the official Ubuntu package manager:
+```bash
+sudo apt-get update
+sudo apt-get install -y dotnet-sdk-8.0
+```
+
+### For running the self-contained binary (no runtime required):
+The binary in [target/publish/QrTerminal.Cli](file:///k:/Dev/RELANGHACKATHON/qrterminal/target/publish/QrTerminal.Cli) is a self-contained single-file executable built for `linux-x64`. It has the .NET runtime bundled directly inside it and does not require the .NET SDK or runtime to be installed on Ubuntu 24.04.
+You may only need to make it executable:
+```bash
+chmod +x target/publish/QrTerminal.Cli
+```
 
 ## Build
 

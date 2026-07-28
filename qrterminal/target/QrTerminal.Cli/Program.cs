@@ -11,7 +11,6 @@ Console.OutputEncoding = new UTF8Encoding(false);
 bool verboseFlag = false;
 string levelFlag = "L";
 int quietZoneFlag = 2;
-bool sixelDisableFlag = false;
 
 var positionalArgs = new List<string>();
 int i = 0;
@@ -27,7 +26,6 @@ while (i < cliArgs.Length)
     }
     else if (arg == "-s" || arg == "--s")
     {
-        sixelDisableFlag = true;
         i++;
     }
     else if (arg == "-l" || arg == "--l")
