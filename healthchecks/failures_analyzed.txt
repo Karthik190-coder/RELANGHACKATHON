@@ -1,0 +1,363 @@
+Total failed: 104
+
+1. front_get_docs_search_returns_200:
+  Step 1: GET /docs/search/ -> Expected status 200, got 404
+
+2. accounts_post_signup_without_password_field_returns_error:
+  Step 2: POST /accounts/signup/ -> Expected status 200, got 302
+
+3. api_get_ping_body_when_no_body_stored:
+  Step 3: GET /api/v1/checks/{noBdyId}/pings/1/body -> Expected status 404, got 200
+    Actual body: 
+
+4. accounts_get_notifications_when_logged_in_returns_200:
+  Step 3: GET /accounts/profile/notifications/ -> Expected status 200, got 404
+
+5. api_create_with_null_manual_resume_returns_400:
+  Step 1: POST /api/v1/checks/ -> Expected status 400, got 201
+    Actual body: {"badge_url": "http://localhost:8011/b/2/<UUID>.svg", "channels": "", "desc": "", "failure_kw": "", "filter_body": false, "filter_default_fail": false, "filter_http_body": false, "filter_subject": fal
+
+6. api_post_notification_status_with_undelivered_works:
+  Step 1: POST /api/v1/notifications/00000000-0000-0000-0000-000000000000/status -> Expected status 200, got 404
+
+7. api_create_check_with_non_dict_json_returns_400_2:
+
+8. integrations_add_page_returns_404_when_disabled_8:
+  Step 4: GET /projects/{projectCode}/add_shell/ -> Expected status 404, got 200
+
+9. accounts_post_add_totp_with_non_digit_code_shows_error:
+  Step 3: GET /accounts/two_factor/totp/ -> Expected status 200, got 404
+  Step 4: POST /accounts/two_factor/totp/ -> Expected status 200, got 404
+
+10. api_create_with_null_channels_returns_400:
+  Step 1: POST /api/v1/checks/ -> Expected status 400, got 201
+    Actual body: {"badge_url": "http://localhost:8011/b/2/<UUID>.svg", "channels": "", "desc": "", "failure_kw": "", "filter_body": false, "filter_default_fail": false, "filter_http_body": false, "filter_subject": fal
+
+11. accounts_get_project_settings_without_login_redirects:
+  Step 1: GET /projects/00000000-0000-0000-0000-000000000000/settings/ -> Expected status 302, got 404
+
+12. integrations_post_with_invalid_email_shows_error:
+  Step 5: POST /projects/{projectCode}/add_email/ -> Expected status 200, got 302
+
+13. integrations_add_page_returns_404_when_disabled_7:
+  Step 4: GET /projects/{projectCode}/add_pushover/ -> Expected status 404, got 200
+
+14. accounts_post_signup_with_invalid_email_format_returns_error:
+  Step 2: POST /accounts/signup/ -> Expected status 200, got 302
+
+15. accounts_post_check_token_with_nonexistent_username_redirects:
+  Step 2: POST /accounts/check_token/nobody/bad-token/ -> Expected status 302, got 404
+
+16. api_create_with_channels_unassigned_name_returns_400:
+  Step 1: POST /api/v1/checks/ -> Expected status 400, got 201
+    Actual body: {"badge_url": "http://localhost:8011/b/2/<UUID>.svg", "channels": "", "desc": "", "failure_kw": "", "filter_body": false, "filter_default_fail": false, "filter_http_body": false, "filter_subject": fal
+
+17. integrations_channel_lifecycle_create_test_rename_checks_remove_verify_gone_4:
+  Step 5: POST /projects/{projectCode}/add_webhook/ -> Expected status 302, got 200
+  Step 7: POST /integrations/{channelCode}/test/ -> Expected status 302, got None
+  Step 8: POST /integrations/{channelCode}/name/ -> Expected status 302, got None
+  Step 9: GET /integrations/{channelCode}/edit/ -> Expected status 200, got None
+  Step 11: GET /integrations/{channelCode}/checks/ -> Expected status 200, got None
+  Step 12: POST /integrations/{channelCode}/remove/ -> Expected status 302, got None
+  Step 13: GET /integrations/{channelCode}/edit/ -> Expected status 404, got None
+  Step 14: POST /integrations/{channelCode}/test/ -> Expected status 404, got None
+
+18. integrations_edit_email_channel_changes_address_then_verify:
+  Step 7: GET /integrations/{chCode}/edit/ -> Expected status 200, got None
+  Step 8: POST /integrations/{chCode}/edit/ -> Expected status 302, got None
+
+19. front_post_copy_check_redirects:
+  Step 2: GET /accounts/login/ -> Expected status None, got 200
+  Step 5: POST /checks/{cpId}/copy/ -> Expected status 302, got 404
+
+20. front_post_update_timeout_with_cron_schedule_redirects:
+  Step 1: GET /accounts/login/ -> Expected status None, got 200
+  Step 5: POST /checks/{ucCheckId}/timeout/ -> Expected status 302, got 404
+
+21. front_get_tv_with_checks_shows_check_count:
+  Step 3: GET /tv/ -> Expected status 200, got 404
+
+22. integrations_add_page_returns_404_when_disabled_3:
+  Step 4: GET /projects/{projectCode}/add_discord/ -> Expected status 404, got 200
+
+23. accounts_get_accountsprofileappearance_as_alice_returns_200:
+  Step 3: GET /accounts/profile/appearance/ -> Expected status 200, got 404
+
+24. integrations_add_page_returns_404_when_disabled_6:
+  Step 4: GET /projects/{projectCode}/add_pushbullet/ -> Expected status 404, got 200
+
+25. accounts_post_signup_with_valid_email_renders_result_page:
+  Step 2: POST /accounts/signup/ -> Expected status 200, got 302
+
+26. front_add_email_channel_with_invalid_email_format_shows_error:
+  Step 1: GET /accounts/login/ -> Expected status None, got 200
+  Step 5: POST /projects/{nc1Pid}/add_email/ -> Expected status 200, got 302
+
+27. api_get_project_metrics_with_invalid_key_returns_401:
+  Step 1: GET /projects/00000000-0000-0000-0000-000000000000/metrics/invalid -> Expected status 400, got 404
+
+28. integrations_channel_lifecycle_create_test_rename_checks_remove_verify_gone:
+  Step 7: POST /integrations/{channelCode}/test/ -> Expected status 302, got None
+  Step 8: POST /integrations/{channelCode}/name/ -> Expected status 302, got None
+  Step 9: GET /integrations/{channelCode}/edit/ -> Expected status 200, got None
+  Step 11: GET /integrations/{channelCode}/checks/ -> Expected status 200, got None
+  Step 12: POST /integrations/{channelCode}/remove/ -> Expected status 302, got None
+  Step 13: GET /integrations/{channelCode}/edit/ -> Expected status 404, got None
+  Step 14: POST /integrations/{channelCode}/test/ -> Expected status 404, got None
+
+29. accounts_post_add_totp_with_invalid_code_shows_errors:
+  Step 3: GET /accounts/two_factor/totp/ -> Expected status 200, got 404
+  Step 4: POST /accounts/two_factor/totp/ -> Expected status 200, got 404
+
+30. integrations_add_channel_for_webhook_with_all_fields_filled_redirects:
+  Step 5: POST /projects/{pcode}/add_webhook/ -> Expected status 302, got 200
+
+31. accounts_post_login_with_uppercase_email_fails_as_case_sensitive:
+  Step 2: POST /accounts/login/ -> Expected status 302, got 200
+
+32. accounts_get_unsubscribe_with_bad_token_shows_error:
+  Step 1: GET /accounts/unsubscribe_reports/invalid-signed-token/ -> Expected status 200, got 404
+
+33. front_submit_add_check_with_empty_name_shows_error:
+  Step 1: GET /accounts/login/ -> Expected status None, got 200
+  Step 4: POST /projects/{nc1Pid}/checks/add/ -> Expected status 403, got 404
+
+34. api_list_flips_without_api_key_returns_401:
+  Step 1: GET /api/v1/checks/00000000-0000-0000-0000-000000000000/flips/ -> Expected status 401, got 404
+
+35. accounts_post_change_email_with_existing_email_rejected:
+  Step 4: POST /accounts/change_email/ -> Expected status 200, got 302
+
+36. accounts_get_appearance_when_logged_in_returns_200:
+  Step 3: GET /accounts/profile/appearance/ -> Expected status 200, got 404
+
+37. front_submit_add_check_with_timeout_below_60_shows_error:
+  Step 1: GET /accounts/login/ -> Expected status None, got 200
+  Step 4: POST /projects/{nc3Pid}/checks/add/ -> Expected status 403, got 404
+
+38. accounts_post_check_token_with_invalid_token_redirects_to_login:
+  Step 2: POST /accounts/check_token/alice/invalid-token/ -> Expected status 302, got 404
+
+39. front_get_docs_returns_docs_homepage:
+  Step 1: GET /docs/ -> Expected status 200, got 404
+
+40. front_post_cron_preview_with_valid_expression_and_csrf:
+  Step 2: POST /checks/cron_preview/ -> Expected status 200, got 404
+
+41. api_subject_fail_201_chars_400:
+  Step 1: POST /api/v1/checks/ -> Expected status 400, got 201
+    Actual body: {"badge_url": "http://localhost:8011/b/2/<UUID>.svg", "channels": "", "desc": "", "failure_kw": "<TOKEN>", "filter_body": false, "filter_default_fail": false, "filter_http_body": false, "filter_subjec
+
+42. accounts_get_set_password_with_wrong_current_password_shows_error:
+  Step 1: GET /accounts/login/ -> Expected status None, got 200
+  Step 4: POST /accounts/set_password/ -> Expected status 200, got 302
+
+43. api_post_notification_status_with_failed_sets_error:
+  Step 1: POST /api/v1/notifications/00000000-0000-0000-0000-000000000000/status -> Expected status 200, got 404
+
+44. integrations_add_page_returns_404_when_disabled_5:
+  Step 4: GET /projects/{projectCode}/add_matrix/ -> Expected status 404, got 200
+
+45. accounts_get_project_settings_page_includes_transfer_section:
+  Step 1: GET /accounts/login/ -> Expected status None, got 200
+  Step 4: GET /projects/{tProjId}/settings/ -> Expected status 200, got 404
+
+46. front_post_add_check_via_project_page_redirects:
+  Step 1: GET /accounts/login/ -> Expected status None, got 200
+  Step 5: POST /projects/{pCode}/checks/add/ -> Expected status 400, got 404
+
+47. front_get_docs_search_with_empty_query:
+  Step 1: GET /docs/search/ -> Expected status 200, got 404
+
+48. integrations_post_with_empty_value_shows_error:
+  Step 5: POST /projects/{projectCode}/add_slack/ -> Expected status 200, got 302
+
+49. front_get_docssearchqa_returns_results_for_very_short_term:
+  Step 1: GET /docs/search/?q=a -> Expected status 200, got 404
+
+50. accounts_post_signup_with_valid_data_and_password_creates_user_page:
+  Step 2: POST /accounts/signup/ -> Expected status 200, got 302
+
+51. front_get_without_auth_redirects_to_login:
+  Step 1: GET / -> Expected status 302, got 200
+
+52. accounts_post_appearance_with_theme_auto_returns_200_or_302:
+  Step 3: GET /accounts/profile/appearance/ -> Expected status 200, got 404
+
+53. integrations_channel_lifecycle_create_test_rename_checks_remove_verify_gone_2:
+  Step 8: POST /projects/{projectCode}/add_group/ -> Expected status 302, got None
+  Step 10: POST /integrations/{channelCode}/test/ -> Expected status 302, got None
+  Step 11: POST /integrations/{channelCode}/name/ -> Expected status 302, got None
+  Step 12: GET /integrations/{channelCode}/edit/ -> Expected status 200, got None
+  Step 14: GET /integrations/{channelCode}/checks/ -> Expected status 200, got None
+  Step 15: POST /integrations/{channelCode}/remove/ -> Expected status 302, got None
+  Step 16: GET /integrations/{channelCode}/edit/ -> Expected status 404, got None
+  Step 17: POST /integrations/{channelCode}/test/ -> Expected status 404, got None
+
+54. accounts_post_set_password_with_correct_current_password_returns_page:
+  Step 1: GET /accounts/login/ -> Expected status None, got 200
+  Step 4: POST /accounts/set_password/ -> Expected status 200, got 302
+
+55. front_submit_add_check_with_name_over_100_chars_shows_error:
+  Step 1: GET /accounts/login/ -> Expected status None, got 200
+  Step 4: POST /projects/{nc2Pid}/checks/add/ -> Expected status 403, got 404
+
+56. accounts_get_profile_shows_report_preferences_section:
+  Step 3: GET /accounts/profile/notifications/ -> Expected status 200, got 404
+
+57. front_get_docs_returns_200_2:
+  Step 1: GET /docs/ -> Expected status 200, got 404
+
+58. api_get_metrics_with_checks:
+  Step 2: GET /api/v1/metrics/ -> Expected status 403, got 404
+
+59. front_get_ping_body_page_for_raw_body_shows_raw_content:
+  Step 5: GET /checks/{rawId}/pings/1/body/ -> Expected status 200, got 404
+
+60. front_post_test_for_nonexistent_channel_returns_404:
+  Step 1: GET /accounts/login/ -> Expected status None, got 200
+  Step 3: POST /integrations/00000000-0000-0000-0000-000000000000/test/ -> Expected status 403, got 404
+
+61. front_get_docssearchq_returns_empty_search_results:
+  Step 1: GET /docs/search/?q= -> Expected status 200, got 404
+
+62. accounts_signup_csrf_token_can_be_used_for_signup_post:
+  Step 2: POST /accounts/signup/ -> Expected status 200, got 302
+
+63. payments_get_project_pricing_without_auth_returns_200:
+  Step 1: GET /projects/00000000-0000-0000-0000-000000000000/pricing/ -> Expected status 200, got 404
+
+64. accounts_post_profile_with_invalid_sort_value_returns_form:
+  Step 3: POST /accounts/profile/ -> Expected status 200, got 404
+
+65. api_post_notification_status_with_delivered_succeeds:
+  Step 1: POST /api/v1/notifications/00000000-0000-0000-0000-000000000000/status -> Expected status 200, got 404
+
+66. accounts_get_add_totp_page_without_auth_redirects_to_login:
+  Step 1: GET /accounts/two_factor/totp/ -> Expected status 302, got 404
+
+67. accounts_get_add_project_page_without_login_redirects:
+  Step 1: GET /projects/add/ -> Expected status 302, got 404
+
+68. api_create_with_null_methods_returns_400:
+
+69. integrations_add_page_returns_404_when_disabled_4:
+  Step 4: GET /projects/{projectCode}/add_github/ -> Expected status 404, got 200
+
+70. integrations_metrics_with_valid_key_returns_200:
+  Step 4: GET /projects/{projectCode}/metrics/RRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRR -> Expected status 200, got 404
+
+71. accounts_get_notifications_page_shows_nag_period_setting:
+  Step 3: GET /accounts/profile/notifications/ -> Expected status 200, got 404
+
+72. api_post_to_flips_endpoint_returns_405:
+  Step 1: POST /api/v1/checks/00000000-0000-0000-0000-000000000000/flips/ -> Expected status 405, got 404
+
+73. api_list_flips_with_wrong_api_key_returns_401:
+  Step 1: GET /api/v1/checks/00000000-0000-0000-0000-000000000000/flips/ -> Expected status 401, got 404
+
+74. api_get_status_returns_ok:
+  Step 1: GET /api/v1/status/ -> Expected status 200, got 404
+
+75. accounts_get_add_totp_when_logged_in_shows_form:
+  Step 3: GET /accounts/two_factor/totp/ -> Expected status 200, got 404
+
+76. accounts_get_notifications_without_login_redirects:
+  Step 1: GET /accounts/profile/notifications/ -> Expected status 302, got 404
+
+77. front_add_email_channel_with_email_over_100_chars_shows_error:
+  Step 1: GET /accounts/login/ -> Expected status None, got 200
+  Step 5: POST /projects/{nc2Pid}/add_email/ -> Expected status 200, got 302
+
+78. api_ping_with_empty_rid_param_returns_400:
+  Step 2: POST /ping/{ridEmptyId}/?rid= -> Expected status 400, got 200
+
+79. front_get_project_badges_page_returns_200:
+  Step 1: GET /accounts/login/ -> Expected status None, got 200
+  Step 4: GET /projects/{pbPid}/badges/ -> Expected status 200, got 404
+
+80. accounts_get_appearance_without_login_redirects:
+  Step 1: GET /accounts/profile/appearance/ -> Expected status 302, got 404
+
+81. front_post_remove_for_nonexistent_channel_returns_404:
+  Step 1: GET /accounts/login/ -> Expected status None, got 200
+  Step 3: POST /integrations/00000000-0000-0000-0000-000000000000/remove/ -> Expected status 403, got 404
+
+82. accounts_post_signup_with_team_invitation_code_handled:
+  Step 2: POST /accounts/signup/ -> Expected status 200, got 302
+
+83. integrations_add_page_returns_404_when_disabled:
+  Step 4: GET /projects/{projectCode}/add_apprise/ -> Expected status 404, got 200
+
+84. accounts_get_project_settings_page_when_logged_in_returns_200:
+  Step 1: GET /accounts/login/ -> Expected status None, got 200
+  Step 4: GET /projects/{projId}/settings/ -> Expected status 200, got 404
+
+85. accounts_signup_csrf_while_authenticated_returns_403:
+  Step 3: GET /accounts/signup/csrf/ -> Expected status 403, got 200
+
+86. front_post_cron_preview_with_invalid_expression_and_csrf:
+  Step 2: POST /checks/cron_preview/ -> Expected status 200, got 404
+
+87. accounts_get_check_token_with_invalid_token_shows_submit_form:
+  Step 1: GET /accounts/check_token/alice/invalid-token/ -> Expected status 200, got 404
+
+88. api_subject_201_chars_400:
+  Step 1: POST /api/v1/checks/ -> Expected status 400, got 201
+    Actual body: {"badge_url": "http://localhost:8011/b/2/<UUID>.svg", "channels": "", "desc": "", "failure_kw": "", "filter_body": false, "filter_default_fail": false, "filter_http_body": false, "filter_subject": tru
+
+89. front_get_switch_channel_without_auth_redirects:
+  Step 1: GET /checks/00000000-0000-0000-0000-000000000000/channels/00000000-0000-0000-0000-000000000000/enabled -> Expected status 302, got 404
+
+90. accounts_post_signup_with_email_exceeding_254_chars_returns_error:
+  Step 2: POST /accounts/signup/ -> Expected status 200, got 302
+
+91. front_get_last_ping_details_returns_200:
+  Step 1: GET /accounts/login/ -> Expected status None, got 200
+  Step 4: GET /checks/{pdCheckId}/last_ping/ -> Expected status 200, got 404
+
+92. integrations_channel_lifecycle_create_test_rename_checks_remove_verify_gone_3:
+  Step 7: POST /integrations/{channelCode}/test/ -> Expected status 302, got None
+  Step 8: POST /integrations/{channelCode}/name/ -> Expected status 302, got None
+  Step 10: GET /integrations/{channelCode}/checks/ -> Expected status 200, got None
+  Step 11: POST /integrations/{channelCode}/remove/ -> Expected status 302, got None
+  Step 12: GET /integrations/{channelCode}/edit/ -> Expected status 404, got None
+  Step 13: POST /integrations/{channelCode}/test/ -> Expected status 404, got None
+
+93. front_get_uncloak_without_login_redirects:
+  Step 1: GET /cloaked/0000000000000000000000000000000000000000/ -> Expected status 302, got 404
+
+94. front_post_update_timeout_redirects:
+  Step 1: GET /accounts/login/ -> Expected status None, got 200
+  Step 5: POST /checks/{utCheckId}/timeout/ -> Expected status 302, got 404
+
+95. api_create_with_channels_non_string_returns_400:
+  Step 1: POST /api/v1/checks/ -> Expected status 400, got 201
+    Actual body: {"badge_url": "http://localhost:8011/b/2/<UUID>.svg", "channels": "", "desc": "", "failure_kw": "", "filter_body": false, "filter_default_fail": false, "filter_http_body": false, "filter_subject": fal
+
+96. front_get_docs_returns_200:
+  Step 1: GET /docs/ -> Expected status 200, got 404
+
+97. payments_get_project_pricing_when_authenticated_renders_upgrade:
+  Step 4: GET /projects/{pcode}/pricing/ -> Expected status 200, got 404
+
+98. api_list_flips_for_check_returns_empty_initially:
+  Step 2: GET /api/v1/checks/{flipsId}/flips/ -> Expected status 200, got 404
+
+99. front_get_tv_dashboard_returns_200:
+  Step 1: GET /tv/ -> Expected status 200, got 404
+
+100. api_flips_by_unique_key_returns_empty_initially:
+  Step 2: GET /api/v1/checks/{fbkId}/flips/ -> Expected status 200, got 404
+
+101. integrations_add_channel_for_whatsapp_with_minimal_label:
+  Step 4: GET /projects/{pcode}/add_whatsapp/ -> Expected status 404, got 200
+
+102. payments_get_project_pricing_with_uuid_returns_200:
+  Step 1: GET /projects/00000000-0000-0000-0000-000000000000/pricing/ -> Expected status 200, got 404
+
+103. api_post_notification_status_for_nonexistent_notification_returns_404:
+  Step 1: POST /api/v1/notifications/00000000-0000-0000-0000-000000000000/status -> Expected status 200, got 404
+
+104. integrations_add_page_returns_404_when_disabled_12:
+  Step 4: GET /projects/{projectCode}/add_whatsapp/ -> Expected status 404, got 200

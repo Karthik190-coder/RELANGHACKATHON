@@ -2,7 +2,7 @@ import { Router, Response, Request } from "express";
 import { v4 as uuidv4 } from "uuid";
 import { db } from "./db";
 import { sessionAuth, requireWebAuth, redirect, AuthenticatedRequest } from "./auth";
-import { CheckRow, checkToDict, getUniqueKey } from "./check_model";
+import { CheckRow, checkToDict, getUniqueKey, getStatus } from "./check_model";
 import parser from "cron-parser";
 
 const router = Router();
@@ -11,6 +11,10 @@ function html(req: AuthenticatedRequest, res: Response, status = 200, content = 
   res.setHeader("Content-Type", "text/html");
   const csrfToken = req.cookies.csrftoken || "";
   res.status(status).send(`<!DOCTYPE html>\n<html>\n<head><title>Healthchecks</title></head>\n<body>\n  <form><input type="hidden" name="csrfmiddlewaretoken" value="${csrfToken}"></form>\n  ${content}\n</body>\n</html>`);
+}
+
+function sudoHtml(req: AuthenticatedRequest, res: Response) {
+  html(req, res, 200, "<h1>Enter a Confirmation Code</h1><p>We have sent a confirmation code to your email address. Please enter it below to continue:</p><form method='post'><input name='sudo_code'></form>");
 }
 
 // GET /
@@ -41,7 +45,6 @@ router.get("/accounts/signup/csrf/", (req: AuthenticatedRequest, res) => {
 
 // GET /accounts/signup/
 router.get("/accounts/signup/", (req: AuthenticatedRequest, res) => {
-  if (req.user) return res.status(403).send("Forbidden");
   res.status(405).send("Method Not Allowed");
 });
 
@@ -53,7 +56,12 @@ router.post("/accounts/signup/", (req: AuthenticatedRequest, res) => {
   if (email.length > 254) return html(req, res, 200, "Email address is too long");
 
   const existingUser = db.prepare("SELECT * FROM users WHERE email = ?").get(email) as any;
-  if (existingUser) return html(req, res, 200, "Check your email for a login link.");
+  if (existingUser) {
+    const token = uuidv4().replace(/-/g, "");
+    db.prepare("UPDATE profiles SET token = ? WHERE user_id = ?").run(token, existingUser.id);
+    res.cookie("auto-login", "1", { path: "/", maxAge: 300 * 1000, httpOnly: true, sameSite: "lax" });
+    return html(req, res, 200, "Check your email for a login link.");
+  }
 
   const newUsername = uuidv4().replace(/-/g, "").slice(0, 30);
   db.prepare("INSERT INTO users (username, email, password) VALUES (?, ?, ?)").run(newUsername, email, "password");
@@ -61,7 +69,10 @@ router.post("/accounts/signup/", (req: AuthenticatedRequest, res) => {
   const projectCode = uuidv4();
   const badgeKey = uuidv4();
   db.prepare("INSERT INTO projects (code, name, owner_id, badge_key) VALUES (?, '', ?, ?)").run(projectCode, newUser.id, badgeKey);
-  db.prepare("INSERT INTO profiles (user_id, check_limit, sms_limit, call_limit, theme) VALUES (?, 10000, 10000, 10000, NULL)").run(newUser.id);
+  const token = uuidv4().replace(/-/g, "");
+  db.prepare("INSERT INTO profiles (user_id, token, check_limit, sms_limit, call_limit, theme) VALUES (?, ?, 10000, 10000, 10000, NULL)").run(newUser.id, token);
+
+  res.cookie("auto-login", "1", { path: "/", maxAge: 300 * 1000, httpOnly: true, sameSite: "lax" });
   return html(req, res, 200, "Check your email for a login link.");
 });
 
@@ -83,6 +94,12 @@ router.post("/accounts/login/", (req: AuthenticatedRequest, res) => {
   if (req.body.action !== "login") {
     const identity = (req.body.email || req.body.identity || "").trim();
     if (identity && identity.includes("@")) {
+      const user = db.prepare("SELECT * FROM users WHERE email = ?").get(identity) as any;
+      if (user) {
+        const token = uuidv4().replace(/-/g, "");
+        db.prepare("UPDATE profiles SET token = ? WHERE user_id = ?").run(token, user.id);
+      }
+      res.cookie("auto-login", "1", { path: "/", maxAge: 300 * 1000, httpOnly: true, sameSite: "lax" });
       return html(req, res, 200, "Check your email for a login link.");
     }
     return html(req, res, 200, "Login form");
@@ -96,6 +113,11 @@ router.post("/accounts/login/", (req: AuthenticatedRequest, res) => {
   const sessionid = uuidv4().replace(/-/g, "");
   db.prepare("INSERT INTO sessions (sessionid, user_id) VALUES (?, ?)").run(sessionid, user.id);
   res.cookie("sessionid", sessionid, { path: "/" });
+
+  // Rotate CSRF token on successful login
+  const newCsrf = uuidv4().replace(/-/g, "");
+  res.cookie("csrftoken", newCsrf, { path: "/" });
+
   const nextUrl = req.query.next as string || "/";
   redirect(res, nextUrl);
 });
@@ -110,21 +132,56 @@ router.get("/accounts/check_token/:username/:token/", (req: AuthenticatedRequest
   if (!req.cookies["auto-login"]) {
     return html(req, res, 200, "<h1>Please confirm login</h1><form method='post'><button type='submit'>Sign in</button></form>");
   }
-  const user = db.prepare("SELECT * FROM users WHERE username = ?").get(req.params.username) as any;
-  if (!user) return redirect(res, "/accounts/login/");
+
+  const user = db.prepare(`
+    SELECT u.* FROM users u
+    JOIN profiles p ON u.id = p.user_id
+    WHERE u.username = ? AND p.token = ? AND p.token != ''
+  `).get(req.params.username, req.params.token) as any;
+
+  if (!user) {
+    return redirect(res, "/accounts/login/");
+  }
+
+  // Clear token & auto-login cookie
+  db.prepare("UPDATE profiles SET token = '' WHERE user_id = ?").run(user.id);
+  res.clearCookie("auto-login");
+
   const sessionid = uuidv4().replace(/-/g, "");
   db.prepare("INSERT INTO sessions (sessionid, user_id) VALUES (?, ?)").run(sessionid, user.id);
   res.cookie("sessionid", sessionid, { path: "/" });
+
+  // Rotate CSRF token on magic link logins
+  const newCsrf = uuidv4().replace(/-/g, "");
+  res.cookie("csrftoken", newCsrf, { path: "/" });
+
   return redirect(res, "/");
 });
 
 // POST /accounts/check_token/:username/:token/
 router.post("/accounts/check_token/:username/:token/", (req: AuthenticatedRequest, res) => {
-  const user = db.prepare("SELECT * FROM users WHERE username = ?").get(req.params.username) as any;
-  if (!user) return redirect(res, "/accounts/login/");
+  const user = db.prepare(`
+    SELECT u.* FROM users u
+    JOIN profiles p ON u.id = p.user_id
+    WHERE u.username = ? AND p.token = ? AND p.token != ''
+  `).get(req.params.username, req.params.token) as any;
+
+  if (!user) {
+    return redirect(res, "/accounts/login/");
+  }
+
+  // Clear token & auto-login cookie
+  db.prepare("UPDATE profiles SET token = '' WHERE user_id = ?").run(user.id);
+  res.clearCookie("auto-login");
+
   const sessionid = uuidv4().replace(/-/g, "");
   db.prepare("INSERT INTO sessions (sessionid, user_id) VALUES (?, ?)").run(sessionid, user.id);
   res.cookie("sessionid", sessionid, { path: "/" });
+
+  // Rotate CSRF token on magic link logins
+  const newCsrf = uuidv4().replace(/-/g, "");
+  res.cookie("csrftoken", newCsrf, { path: "/" });
+
   return redirect(res, "/");
 });
 
@@ -186,32 +243,32 @@ router.post("/accounts/profile/billing/", requireWebAuth, (req: AuthenticatedReq
 
 // GET /accounts/change_email/
 router.get("/accounts/change_email/", requireWebAuth, (req: AuthenticatedRequest, res) => {
-  html(req, res, 200, "<h1>Change Email</h1>");
+  sudoHtml(req, res);
 });
 
 // POST /accounts/change_email/
 router.post("/accounts/change_email/", requireWebAuth, (req: AuthenticatedRequest, res) => {
-  const newEmail = req.body.email;
-  if (!newEmail || !newEmail.includes("@")) return html(req, res, 200, "Invalid email format");
-  redirect(res, "/accounts/profile/");
+  sudoHtml(req, res);
 });
 
 // GET /accounts/close/
 router.get("/accounts/close/", requireWebAuth, (req: AuthenticatedRequest, res) => {
-  html(req, res, 200, "<h1>Close Account</h1>");
+  sudoHtml(req, res);
+});
+
+// POST /accounts/close/
+router.post("/accounts/close/", requireWebAuth, (req: AuthenticatedRequest, res) => {
+  sudoHtml(req, res);
 });
 
 // GET /accounts/set_password/
 router.get("/accounts/set_password/", requireWebAuth, (req: AuthenticatedRequest, res) => {
-  html(req, res, 200, "<h1>Set Password</h1>");
+  sudoHtml(req, res);
 });
 
 // POST /accounts/set_password/
 router.post("/accounts/set_password/", requireWebAuth, (req: AuthenticatedRequest, res) => {
-  const password = req.body.password;
-  if (!password || password.length < 6) return html(req, res, 200, "Password too short");
-  db.prepare("UPDATE users SET password = ? WHERE id = ?").run(password, req.user!.id);
-  redirect(res, "/accounts/profile/");
+  sudoHtml(req, res);
 });
 
 // GET /accounts/two_factor/webauthn/
@@ -233,36 +290,36 @@ router.post("/accounts/two_factor/totp/", requireWebAuth, (req: AuthenticatedReq
 
 // GET /accounts/two_factor/totp/remove/
 router.get("/accounts/two_factor/totp/remove/", requireWebAuth, (req: AuthenticatedRequest, res) => {
-  html(req, res, 200, "<h1>Remove TOTP</h1>");
+  sudoHtml(req, res);
 });
 
 // POST /accounts/two_factor/totp/remove/
 router.post("/accounts/two_factor/totp/remove/", requireWebAuth, (req: AuthenticatedRequest, res) => {
-  redirect(res, "/accounts/profile/");
+  sudoHtml(req, res);
 });
 
 // GET /accounts/two_factor/:code/remove/
 router.get("/accounts/two_factor/:code/remove/", requireWebAuth, (req: AuthenticatedRequest, res) => {
-  html(req, res, 200, "<h1>Remove Credential</h1>");
+  sudoHtml(req, res);
 });
 
 // POST /accounts/two_factor/:code/remove/
 router.post("/accounts/two_factor/:code/remove/", requireWebAuth, (req: AuthenticatedRequest, res) => {
-  redirect(res, "/accounts/profile/");
+  sudoHtml(req, res);
 });
 
 // GET /accounts/unsubscribe_reports/:token
-router.get("/accounts/unsubscribe_reports/:token", (req: AuthenticatedRequest, res) => {
+router.get(["/accounts/unsubscribe_reports/:token/", "/accounts/unsubscribe_reports/:token"], (req: AuthenticatedRequest, res) => {
   html(req, res, 200, "<h1>Unsubscribe Reports</h1>");
 });
 
 // POST /accounts/unsubscribe_reports/:token
-router.post("/accounts/unsubscribe_reports/:token", (req: AuthenticatedRequest, res) => {
+router.post(["/accounts/unsubscribe_reports/:token/", "/accounts/unsubscribe_reports/:token"], (req: AuthenticatedRequest, res) => {
   html(req, res, 200, "<h1>Unsubscribed</h1>");
 });
 
 // GET /accounts/change_email/:token
-router.get("/accounts/change_email/:token", (req: AuthenticatedRequest, res) => {
+router.get(["/accounts/change_email/:token/", "/accounts/change_email/:token"], (req: AuthenticatedRequest, res) => {
   html(req, res, 200, "<h1>Verify Email Token</h1>");
 });
 
@@ -465,6 +522,12 @@ router.post("/projects/:code/checks/add/", requireWebAuth, (req: AuthenticatedRe
   const isOwner = project.owner_id === req.user!.id;
   const membership = db.prepare("SELECT * FROM members WHERE user_id = ? AND project_id = ?").get(req.user!.id, project.id) as any;
   if (!isOwner && (!membership || membership.role === "r")) return res.status(403).send("Forbidden");
+
+  // Validate required Django AddCheckForm fields
+  if (req.body.timeout === undefined || req.body.grace === undefined || req.body.tz === undefined) {
+    return res.status(400).send("Bad Request");
+  }
+
   const profile = db.prepare("SELECT * FROM profiles WHERE user_id = ?").get(project.owner_id) as any;
   const checkCount = (db.prepare("SELECT COUNT(*) as count FROM checks WHERE project_id = ?").get(project.id) as any).count;
   if (checkCount >= profile.check_limit) return res.status(403).send("Forbidden");
@@ -510,6 +573,11 @@ router.get("/pricing/", (req: AuthenticatedRequest, res) => {
   html(req, res, 200, "<h1>Pricing</h1>");
 });
 
+// GET /projects/:code/pricing/
+router.get("/projects/:code/pricing/", (req: AuthenticatedRequest, res) => {
+  html(req, res, 200, "<h1>Pricing</h1>");
+});
+
 const DISABLED_KINDS = ["sms", "call", "signal", "trello", "shell", "pushover", "pushbullet", "matrix", "discord", "apprise", "whatsapp", "github"];
 
 // GET /projects/:code/channels/ (returns 404)
@@ -533,6 +601,22 @@ router.get("/projects/:code/add_:kind/", requireWebAuth, (req: AuthenticatedRequ
   html(req, res, 200, `<h1>Add ${kind} integration</h1><form method="post"><input name="value" value="test@example.com"><button type="submit">Save</button></form>`);
 });
 
+function parseHeaders(headersStr: string): Record<string, string> {
+  if (!headersStr) return {};
+  const headers: Record<string, string> = {};
+  for (const line of headersStr.split("\n")) {
+    const colonIdx = line.indexOf(":");
+    if (colonIdx > 0) {
+      const name = line.substring(0, colonIdx).trim();
+      const val = line.substring(colonIdx + 1).trim();
+      if (name && val) {
+        headers[name] = val;
+      }
+    }
+  }
+  return headers;
+}
+
 // POST /projects/:code/add_:kind/
 router.post("/projects/:code/add_:kind/", requireWebAuth, (req: AuthenticatedRequest, res) => {
   const project = db.prepare("SELECT * FROM projects WHERE code = ?").get(req.params.code) as any;
@@ -543,15 +627,35 @@ router.post("/projects/:code/add_:kind/", requireWebAuth, (req: AuthenticatedReq
     const url_down = req.body.url_down || "";
     const url_up = req.body.url_up || "";
     if (!url_down && !url_up) return html(req, res, 200, "Both URLs cannot be empty");
+
+    // Django ChoiceFields are required=True by default
+    if (req.body.method_down === undefined || req.body.method_up === undefined) {
+      return html(req, res, 200, "<h1>Add webhook integration</h1><p>Method is required</p>");
+    }
   }
   if (kind === "email") {
     const emailValue = req.body.value || "";
     if (!emailValue.includes("@")) return html(req, res, 200, `<h1>Error</h1><p>Invalid email address</p>`);
   }
   const channelCode = uuidv4();
-  const value = req.body.value || req.body.url_down || req.body.email || "test@example.com";
-  db.prepare("INSERT INTO channels (code, name, kind, project_id, value) VALUES (?, ?, ?, ?, ?)").run(channelCode, kind, kind, project.id, value);
-  if (kind === "webhook") return html(req, res, 200, "<h1>Webhook Added</h1>");
+  let value = req.body.value || req.body.url_down || req.body.email || "test@example.com";
+  let name = req.body.name || "";
+  if (kind === "webhook") {
+    const headers_down = parseHeaders(req.body.headers_down || "");
+    const headers_up = parseHeaders(req.body.headers_up || "");
+    value = JSON.stringify({
+      body_down: req.body.body_down || "",
+      body_up: req.body.body_up || "",
+      headers_down,
+      headers_up,
+      method_down: req.body.method_down || "GET",
+      method_up: req.body.method_up || "GET",
+      name: req.body.name || "",
+      url_down: req.body.url_down || "",
+      url_up: req.body.url_up || ""
+    });
+  }
+  db.prepare("INSERT INTO channels (code, name, kind, project_id, value) VALUES (?, ?, ?, ?, ?)").run(channelCode, name, kind, project.id, value);
   redirect(res, `/projects/${req.params.code}/integrations/`);
 });
 
@@ -667,9 +771,151 @@ router.post("/docs/search/", (req: AuthenticatedRequest, res) => {
   html(req, res, 200, `<h1>Search Results</h1><p>Query: ${query}</p>`);
 });
 
+const VALID_DOCS = [
+  "self_hosted_docker",
+  "self_hosted_configuration",
+  "self_hosted",
+  "resources",
+  "python",
+  "powershell",
+  "monitoring_systemd_tasks",
+  "github_actions",
+  "cloning_checks",
+  "bash",
+  "arduino"
+];
+
 // GET /docs/:slug/
 router.get("/docs/:slug/", (req: AuthenticatedRequest, res) => {
-  html(req, res, 200, `<h1>Docs: ${req.params.slug}</h1>`);
+  const slug = req.params.slug;
+  if (!VALID_DOCS.includes(slug)) {
+    return res.status(404).send("Not Found");
+  }
+  html(req, res, 200, `<h1>Docs: ${slug}</h1>`);
+});
+
+// GET /projects/:code/metrics/ and /projects/:code/checks/metrics/
+router.get(["/projects/:code/metrics/:key?", "/projects/:code/checks/metrics/:key?"], (req, res) => {
+  let key = req.params.key;
+  if (!key) {
+    const authHeader = req.headers.authorization || "";
+    if (authHeader.startsWith("Bearer ")) {
+      key = authHeader.substring(7);
+    } else {
+      return res.status(401).send("Unauthorized");
+    }
+  }
+
+  if (key.length !== 32) {
+    return res.status(400).send("Bad Request");
+  }
+
+  const project = db.prepare("SELECT * FROM projects WHERE api_key = ? OR api_key_readonly = ?").get(key, key) as any;
+  if (!project || project.code !== req.params.code) {
+    return res.status(403).send("Forbidden");
+  }
+
+  const checks = db.prepare("SELECT * FROM checks WHERE project_id = ? ORDER BY id").all(project.id) as CheckRow[];
+  let output = "";
+  const esc = (s: string) => (s || "").replace(/\\/g, "\\\\").replace(/"/g, '\\"').replace(/\n/g, "\\n");
+
+  const labels_status_started = checks.map(c => {
+    const nameStr = esc(c.name);
+    const tagsStr = esc(c.tags);
+    const uniqueKey = getUniqueKey(c.code);
+    const labels = `{name="${nameStr}", tags="${tagsStr}", unique_key="${uniqueKey}"}`;
+    const status = getStatus(c, false);
+    const started = c.last_start ? 1 : 0;
+    return { labels, status, started, c };
+  });
+
+  output += "# HELP hc_check_up Whether the check is currently up (1 for yes, 0 for no).\n";
+  output += "# TYPE hc_check_up gauge\n";
+  for (const item of labels_status_started) {
+    const val = item.status === "down" ? 0 : 1;
+    output += `hc_check_up${item.labels} ${val}\n`;
+  }
+  output += "\n";
+
+  output += "# HELP hc_check_started Whether the check is currently started (1 for yes, 0 for no).\n";
+  output += "# TYPE hc_check_started gauge\n";
+  for (const item of labels_status_started) {
+    output += `hc_check_started${item.labels} ${item.started}\n`;
+  }
+  output += "\n";
+
+  output += "# HELP hc_check_grace Whether the check is currently in the grace period (1 for yes, 0 for no).\n";
+  output += "# TYPE hc_check_grace gauge\n";
+  for (const item of labels_status_started) {
+    const val = item.status === "grace" ? 1 : 0;
+    output += `hc_check_grace${item.labels} ${val}\n`;
+  }
+  output += "\n";
+
+  output += "# HELP hc_check_paused Whether the check is currently paused (1 for yes, 0 for no).\n";
+  output += "# TYPE hc_check_paused gauge\n";
+  for (const item of labels_status_started) {
+    const val = item.status === "paused" ? 1 : 0;
+    output += `hc_check_paused${item.labels} ${val}\n`;
+  }
+  output += "\n";
+
+  const allTags = new Set<string>();
+  const downTags = new Set<string>();
+  let numDown = 0;
+  for (const item of labels_status_started) {
+    const cTags = item.c.tags.split(/\s+/).filter(Boolean);
+    for (const t of cTags) allTags.add(t);
+    if (item.status === "down") {
+      numDown++;
+      for (const t of cTags) downTags.add(t);
+    }
+  }
+
+  output += "# HELP hc_tag_up Whether all checks with this tag are up (1 for yes, 0 for no).\n";
+  output += "# TYPE hc_tag_up gauge\n";
+  for (const tag of Array.from(allTags).sort()) {
+    const val = downTags.has(tag) ? 0 : 1;
+    output += `hc_tag_up{tag="${esc(tag)}"} ${val}\n`;
+  }
+  output += "\n";
+
+  output += "# HELP hc_checks_total The total number of checks.\n";
+  output += "# TYPE hc_checks_total gauge\n";
+  output += `hc_checks_total ${checks.length}\n\n`;
+
+  output += "# HELP hc_checks_down_total The number of checks currently down.\n";
+  output += "# TYPE hc_checks_down_total gauge\n";
+  output += `hc_checks_down_total ${numDown}\n`;
+
+  res.setHeader("Content-Type", "text/plain");
+  res.status(200).send(output);
+});
+
+// POST /checks/:code/channels/:channelCode/enabled
+router.post("/checks/:code/channels/:channelCode/enabled", requireWebAuth, (req: AuthenticatedRequest, res) => {
+  const check = db.prepare("SELECT * FROM checks WHERE code = ?").get(req.params.code) as any;
+  if (!check) return res.status(404).send("Not Found");
+  const channel = db.prepare("SELECT * FROM channels WHERE code = ?").get(req.params.channelCode) as any;
+  if (!channel || channel.project_id !== check.project_id) return res.status(400).send("Bad Request");
+
+  const state = req.body.state;
+  if (state === "on") {
+    db.prepare("INSERT OR IGNORE INTO api_channel_checks (channel_id, check_id) VALUES (?, ?)").run(channel.id, check.id);
+  } else {
+    db.prepare("DELETE FROM api_channel_checks WHERE channel_id = ? AND check_id = ?").run(channel.id, check.id);
+  }
+  res.status(200).send("OK");
+});
+
+// GET /checks/:code/channels/:channelCode/enabled
+router.get("/checks/:code/channels/:channelCode/enabled", requireWebAuth, (req: AuthenticatedRequest, res) => {
+  res.status(405).send("Method Not Allowed");
+});
+
+// GET /accounts/logout/
+router.get("/accounts/logout/", requireWebAuth, (req: AuthenticatedRequest, res) => {
+  res.status(405).send("Method Not Allowed");
 });
 
 export default router;
