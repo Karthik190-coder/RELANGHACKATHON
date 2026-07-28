@@ -40,6 +40,10 @@ function validateSpec(body: any): string | null {
       if (k === "unique") {
         return `json validation error: unique is not an array`;
       }
+      if (k === "methods") {
+        // Django check_nulls converts null → 0.0, Pydantic literal_error → "has unexpected value"
+        return `json validation error: ${k} has unexpected value`;
+      }
       return `json validation error: ${k} is not a string`;
     }
   }
@@ -102,9 +106,11 @@ function validateSpec(body: any): string | null {
       return "json validation error: schedule is not a valid cron or OnCalendar expression";
     }
   }
-  // methods
+  // methods: Django check_nulls converts null → 0.0 (float) → Pydantic literal_error → "has unexpected value"
   if (body.methods !== undefined) {
-    if (typeof body.methods !== "string") return "json validation error: methods is not a string";
+    if (body.methods === null || typeof body.methods !== "string") {
+      return "json validation error: methods has unexpected value";
+    }
     if (body.methods !== "" && body.methods !== "POST") {
       return "json validation error: methods has unexpected value";
     }

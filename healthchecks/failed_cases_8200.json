@@ -1,5 +1,16 @@
 [
   {
+    "id": "api_create_check_with_invalid_json_returns_400",
+    "test_case": {
+      "id": "api_create_check_with_invalid_json_returns_400",
+      "type": "http_replay",
+      "data": "{\"steps\":[{\"request\":{\"method\":\"POST\",\"path\":\"/api/v1/checks/\",\"headers\":{\"content-type\":\"application/json\",\"x-api-key\":\"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\"},\"body\":\"this is not json\"},\"expected\":{\"status\":400},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
+      "timeout": 300,
+      "files": null
+    },
+    "actual_output": "[{\"body\": \"{\\\"error\\\": \\\"json validation error: value is not an object\\\"}\", \"content-type\": \"application/json\", \"status\": 400, \"step\": 1}]"
+  },
+  {
     "id": "api_create_with_null_methods_returns_400",
     "test_case": {
       "id": "api_create_with_null_methods_returns_400",
@@ -9,16 +20,5 @@
       "files": null
     },
     "actual_output": "[{\"body\": \"{\\\"error\\\": \\\"json validation error: methods is not a string\\\"}\", \"content-type\": \"application/json\", \"status\": 400, \"step\": 1}]"
-  },
-  {
-    "id": "api_create_check_with_non_dict_json_returns_400_2",
-    "test_case": {
-      "id": "api_create_check_with_non_dict_json_returns_400_2",
-      "type": "http_replay",
-      "data": "{\"steps\":[{\"request\":{\"method\":\"POST\",\"path\":\"/api/v1/checks/\",\"headers\":{\"content-type\":\"application/json\",\"x-api-key\":\"XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX\"},\"body\":\"42\"},\"expected\":{\"status\":400},\"storeCookies\":{},\"store\":{},\"storeHtml\":{}}]}",
-      "timeout": 300,
-      "files": null
-    },
-    "actual_output": "[{\"body\": \"{\\\"error\\\": \\\"could not parse request body\\\"}\", \"content-type\": \"application/json\", \"status\": 400, \"step\": 1}]"
   }
 ]
