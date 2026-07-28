@@ -45,9 +45,12 @@ def main():
         futures = [executor.submit(run_one_tc, tc, program_cmd) for tc in test_cases]
         results = [f.result() for f in as_completed(futures)]
     results.sort(key=lambda r: r["id"])
+    print(f"Generated {len(results)} results", file=sys.stderr)
+    print(results[:3], file=sys.stderr)
     json.dump(results, sys.stdout, indent=2)
 if __name__ == "__main__":
     try:
         main()
-    except Exception:
-        json.dump([], sys.stdout)
+    except Exception as e:
+        import traceback
+        traceback.print_exc()

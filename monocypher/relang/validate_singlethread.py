@@ -1,5 +1,4 @@
 #!/usr/bin/env python3
-
 import os
 import sys
 import json
@@ -21,7 +20,6 @@ RED = "\033[91m"
 RESET = "\033[0m"
 
 
-
 def run_one_test(fpath, program_cmd, output_dir):
     with open(fpath) as f:
         tc = json.load(f)
@@ -34,14 +32,23 @@ def run_one_test(fpath, program_cmd, output_dir):
     expected_hash = hashlib.sha256(expected["output"].encode("utf-8")).hexdigest()
     actual_stdout = run_tool(program_cmd, tc)
     actual_hash = hashlib.sha256(actual_stdout.encode("utf-8")).hexdigest()
+    if actual_hash != expected_hash:
+        # write mismatch details for inspection
+        idx = os.path.basename(fpath)
+        with open(os.path.join(HERE, f"mismatch_{idx}.txt"), 'w', encoding='utf-8') as m:
+            m.write(f"TEST: {test_id}\n")
+            m.write("--- expected repr:\n")
+            m.write(repr(expected['output']) + "\n")
+            m.write("--- actual repr:\n")
+            m.write(repr(actual_stdout) + "\n")
     return (test_id, actual_hash == expected_hash)
+
 
 def main():
     if len(sys.argv) < 2:
         print(f"Usage: {sys.argv[0]} <program_cmd>")
         sys.exit(1)
 
-    # On Windows preserve backslashes in paths when splitting the program command
     if os.name == 'nt':
         program_cmd = sys.argv[1].split()
     else:
@@ -58,7 +65,8 @@ def main():
     passed = 0
     total = len(test_files)
 
-    with ThreadPoolExecutor(max_workers=os.cpu_count()) as executor:
+    # force single-threaded to avoid concurrency surprises
+    with ThreadPoolExecutor(max_workers=1) as executor:
         futures = {executor.submit(run_one_test, fpath, program_cmd, output_dir): fpath for fpath in test_files}
         for future in as_completed(futures):
             test_id, ok = future.result()
