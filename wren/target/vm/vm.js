@@ -7,6 +7,7 @@ const {
   ObjString,
   ObjList,
   ObjMap,
+  ObjRange,
   ObjFiber,
   ObjClosure,
   ObjUpvalue,
@@ -32,11 +33,22 @@ class VM {
   }
 
   initCore() {
-    const coreClasses = ["Object", "Class", "Bool", "Num", "String", "List", "Map", "Fn", "Fiber", "System", "Sequence"];
+    const coreClasses = ["Object", "Class", "Bool", "Num", "String", "StringByteSequence", "StringCodePointSequence", "List", "Map", "MapSequence", "MapKeySequence", "MapValueSequence", "Fn", "Fiber", "System", "Sequence", "Null", "Range", "MapEntry"];
     coreClasses.forEach(name => {
       const cls = new ObjClass(name);
       this.classes.set(name, cls);
       this.defineModuleVar("core", name, cls);
+    });
+
+    const objectClass = this.getClassByName("Object");
+    const sequenceClass = this.getClassByName("Sequence");
+    ["Class", "Bool", "Num", "String", "List", "Map", "Fn", "Fiber", "System", "Sequence", "Null", "Range", "MapEntry"].forEach(name => {
+      const cls = this.getClassByName(name);
+      if (cls) cls.superclass = objectClass;
+    });
+    ["String", "List", "Map", "StringByteSequence", "StringCodePointSequence", "MapSequence", "MapKeySequence", "MapValueSequence"].forEach(name => {
+      const cls = this.getClassByName(name);
+      if (cls) cls.superclass = sequenceClass;
     });
 
     bindCorePrimitives(this);
@@ -106,6 +118,7 @@ class VM {
     if (typeof value === "string" || value instanceof ObjString) return this.getClassByName("String");
     if (value instanceof ObjList) return this.getClassByName("List");
     if (value instanceof ObjMap) return this.getClassByName("Map");
+    if (value instanceof ObjRange) return this.getClassByName("Range");
     if (value instanceof ObjFiber) return this.getClassByName("Fiber");
     if (value instanceof ObjClosure) return this.getClassByName("Fn");
     if (value instanceof ObjClass) return this.getClassByName("Class");
@@ -116,6 +129,86 @@ class VM {
   bindPrimitive(className, methodSymbol, nativeFn) {
     const key = `${className}.${methodSymbol}`;
     this.primitives.set(key, nativeFn);
+  }
+
+  invoke(receiver, symbol, args = []) {
+    const cls = this.getClass(receiver);
+    const runClosure = (closure) => {
+      const previousFiber = this.currentFiber;
+      const fiber = new ObjFiber(closure, this.getClassByName("Fiber"));
+      fiber.stack = [receiver, ...args];
+      fiber.frames[0].stackStart = 0;
+      this.currentFiber = fiber;
+      const ok = this.run();
+      const result = fiber.stack.length > 0 ? fiber.stack[fiber.stack.length - 1] : null;
+      this.currentFiber = previousFiber;
+      return ok ? result : null;
+    };
+
+    if (receiver instanceof ObjClass && receiver.staticMethods && receiver.staticMethods.has(symbol)) {
+      const method = receiver.staticMethods.get(symbol);
+      if (typeof method === "function") {
+        return method(this, [receiver, ...args]);
+      }
+      if (method && method.fn) {
+        return runClosure(method);
+      }
+      return null;
+    }
+
+    let dispatchClass = cls;
+    while (dispatchClass) {
+      const primKey = `${dispatchClass.name}.${symbol}`;
+      if (this.primitives.has(primKey)) {
+        return this.primitives.get(primKey)(this, [receiver, ...args]);
+      }
+      dispatchClass = dispatchClass.superclass;
+    }
+
+    let methodClosure = null;
+    let methodClass = cls;
+    while (methodClass && !methodClosure) {
+      if (methodClass.methods && methodClass.methods.has(symbol)) {
+        methodClosure = methodClass.methods.get(symbol);
+        break;
+      }
+      methodClass = methodClass.superclass;
+    }
+
+    if (!methodClosure) return null;
+    if (typeof methodClosure === "function") {
+      return methodClosure(this, [receiver, ...args]);
+    }
+    if (methodClosure && methodClosure.fn) {
+      return runClosure(methodClosure);
+    }
+    return null;
+  }
+
+  suspendFiber() {
+    if (this.currentFiber) {
+      this.currentFiber.state = "SUSPENDED";
+    }
+    return null;
+  }
+
+  resumeFiber(fiber) {
+    if (!(fiber instanceof ObjFiber)) return null;
+    const previous = this.currentFiber;
+    this.currentFiber = fiber;
+    fiber.state = "RUNNING";
+    const result = this.run();
+    this.currentFiber = previous;
+    return result;
+  }
+
+  abortFiber(message) {
+    console.error(message === undefined ? "Fiber aborted." : wrenToString(message));
+    if (this.currentFiber) {
+      this.currentFiber.state = "DONE";
+      this.currentFiber.error = message;
+    }
+    return null;
   }
 
   registerModule(name, source) {
@@ -268,34 +361,19 @@ class VM {
           const receiver = args[0];
           const cls = this.getClass(receiver);
 
-          // A class object is an instance of Class, but a native static
-          // method belongs to the class named by that receiver. Looking only
-          // at its meta-class made System.print(), List.new(), Map.new(), and
-          // every other native static call silently miss their bindings.
-          const dispatchClass = receiver instanceof ObjClass
-            ? receiver.name
-            : (cls ? cls.name : "Object");
-          const primKey = `${dispatchClass}.${symbol}`;
-          if (this.primitives.has(primKey)) {
-            const result = this.primitives.get(primKey)(this, args);
-            stack.push(result);
-          } else if (receiver instanceof ObjClass && receiver.staticMethods && receiver.staticMethods.has(symbol)) {
-            const methodClosure = receiver.staticMethods.get(symbol);
-            fiber.pushFrame(methodClosure, stack.length);
-            args.forEach(a => stack.push(a));
-            frame = fiber.frames[fiber.frames.length - 1];
-            code = frame.closure.fn.code;
-            constants = frame.closure.fn.constants;
-          } else if (cls && cls.methods && cls.methods.has(symbol)) {
-            const methodClosure = cls.methods.get(symbol);
-            fiber.pushFrame(methodClosure, stack.length);
-            args.forEach(a => stack.push(a));
-            frame = fiber.frames[fiber.frames.length - 1];
-            code = frame.closure.fn.code;
-            constants = frame.closure.fn.constants;
-          } else {
-            stack.push(null);
+          if (symbol === "is(1)") {
+            let target = args[1];
+            let actual = this.getClass(receiver);
+            let matches = false;
+            while (actual) {
+              if (actual === target) { matches = true; break; }
+              actual = actual.superclass;
+            }
+            stack.push(matches);
+            break;
           }
+
+          stack.push(this.invoke(receiver, symbol, args.slice(1)));
           break;
         }
 

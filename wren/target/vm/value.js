@@ -32,6 +32,19 @@ class ObjMap extends ObjHeader {
   }
 }
 
+class ObjRange extends ObjHeader {
+  constructor(from, to, exclusive = false, classObj = null) {
+    super(classObj);
+    this.from = from;
+    this.to = to;
+    this.exclusive = exclusive;
+  }
+
+  toString() {
+    return `${this.from}${this.exclusive ? '...' : '..'}${this.to}`;
+  }
+}
+
 class ObjFn extends ObjHeader {
   constructor(name = "", arity = 0, numLocals = 0, stackMax = 0, classObj = null) {
     super(classObj);
@@ -148,6 +161,8 @@ function wrenToString(val) {
   if (typeof val === "boolean") return val ? "true" : "false";
   if (typeof val === "number") return val.toString();
   if (typeof val === "string") return val;
+  if (val instanceof ObjRange) return val.toString();
+  if (val instanceof ObjClass) return val.name;
   if (val && typeof val.toString === "function") return val.toString();
   return "[object]";
 }
@@ -157,6 +172,7 @@ module.exports = {
   ObjString,
   ObjList,
   ObjMap,
+  ObjRange,
   ObjFn,
   ObjClosure,
   ObjUpvalue,
