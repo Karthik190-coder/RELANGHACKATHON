@@ -21,7 +21,17 @@ app.use((req, res, next) => {
       if (err2) {
         if (err2 instanceof SyntaxError && "status" in err2 && (err2 as any).status === 400 && "body" in err2) {
           if (req.path.startsWith("/api/")) {
-            return res.status(400).json({ error: "could not parse request body" });
+            // Try to parse the raw body ourselves to distinguish:
+            // - truly invalid JSON → "could not parse request body" (Django behavior)
+            // - valid JSON but not dict/array (e.g. 42) → "value is not an object"
+            const rawBody = (err2 as any).body as string;
+            let parseable = false;
+            try { JSON.parse(rawBody); parseable = true; } catch {}
+            if (parseable) {
+              return res.status(400).json({ error: "json validation error: value is not an object" });
+            } else {
+              return res.status(400).json({ error: "could not parse request body" });
+            }
           }
         }
         return next(err2);

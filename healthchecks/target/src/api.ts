@@ -34,12 +34,17 @@ function validateSpec(body: any): string | null {
       if (k === "timeout" || k === "grace") {
         return `json validation error: ${k} is not a number`;
       }
-      if (["name", "slug", "tags", "desc", "start_kw", "success_kw", "failure_kw", "methods", "tz", "subject", "subject_fail"].includes(k)) {
-        return `json validation error: ${k} is not a string`;
+      if (["manual_resume", "filter_subject", "filter_body", "filter_http_body", "filter_default_fail"].includes(k)) {
+        return `json validation error: ${k} is not a boolean`;
       }
       if (k === "unique") {
         return `json validation error: unique is not an array`;
       }
+      if (k === "methods") {
+        // Django check_nulls converts null → 0.0, Pydantic literal_error → "has unexpected value"
+        return `json validation error: ${k} has unexpected value`;
+      }
+      return `json validation error: ${k} is not a string`;
     }
   }
 
@@ -101,8 +106,11 @@ function validateSpec(body: any): string | null {
       return "json validation error: schedule is not a valid cron or OnCalendar expression";
     }
   }
-  // methods
+  // methods: Django check_nulls converts null → 0.0 (float) → Pydantic literal_error → "has unexpected value"
   if (body.methods !== undefined) {
+    if (body.methods === null || typeof body.methods !== "string") {
+      return "json validation error: methods has unexpected value";
+    }
     if (body.methods !== "" && body.methods !== "POST") {
       return "json validation error: methods has unexpected value";
     }
@@ -112,11 +120,51 @@ function validateSpec(body: any): string | null {
     if (!Array.isArray(body.unique)) return "json validation error: unique is not an array";
     const allowed = ["name", "slug", "tags", "timeout", "grace"];
     for (const val of body.unique) {
+      if (typeof val !== "string") {
+        return "json validation error: unique has unexpected value";
+      }
       if (!allowed.includes(val)) {
         return "json validation error: an item in 'unique' has unexpected value";
       }
     }
   }
+
+  // Boolean fields type checks
+  const boolFields = ["manual_resume", "filter_subject", "filter_body", "filter_http_body", "filter_default_fail"];
+  for (const f of boolFields) {
+    if (body[f] !== undefined) {
+      if (typeof body[f] !== "boolean") {
+        return `json validation error: ${f} is not a boolean`;
+      }
+    }
+  }
+
+  // Length validations for string keywords
+  const lengthFields = [
+    { name: "start_kw", max: 200 },
+    { name: "success_kw", max: 200 },
+    { name: "failure_kw", max: 200 },
+    { name: "subject", max: 200 },
+    { name: "subject_fail", max: 200 }
+  ];
+  for (const f of lengthFields) {
+    if (body[f.name] !== undefined) {
+      if (typeof body[f.name] !== "string") {
+        return `json validation error: ${f.name} is not a string`;
+      }
+      if (body[f.name].length > f.max) {
+        return `json validation error: ${f.name} is too long`;
+      }
+    }
+  }
+
+  // channels validation
+  if (body.channels !== undefined) {
+    if (typeof body.channels !== "string") {
+      return "json validation error: channels is not a string";
+    }
+  }
+
   return null;
 }
 
@@ -227,26 +275,30 @@ function updateCheckFromSpec(check: CheckRow, body: any, v: number): CheckRow {
 
   // Channels M2M update
   if (body.channels !== undefined && body.channels !== null) {
-    db.prepare("DELETE FROM api_channel_checks WHERE check_id = ?").run(check.id);
+    let assignedIds: number[] = [];
     if (body.channels === "*") {
       const pChannels = db.prepare("SELECT id FROM channels WHERE project_id = ?").all(check.project_id) as any[];
-      for (const ch of pChannels) {
-        db.prepare("INSERT INTO api_channel_checks (channel_id, check_id) VALUES (?, ?)").run(ch.id, check.id);
-      }
+      assignedIds = pChannels.map(ch => ch.id);
     } else if (body.channels !== "") {
-      let chIds: string[] = [];
-      if (Array.isArray(body.channels)) {
-        chIds = body.channels.map(String);
-      } else if (typeof body.channels === "string") {
-        chIds = body.channels.split(",");
-      }
+      const chIds = body.channels.split(",");
       const pChannels = db.prepare("SELECT * FROM channels WHERE project_id = ?").all(check.project_id) as any[];
-      for (const chIdStr of chIds) {
-        const ch = pChannels.find(c => c.code === chIdStr || c.name === chIdStr);
-        if (ch) {
-          db.prepare("INSERT INTO api_channel_checks (channel_id, check_id) VALUES (?, ?)").run(ch.id, check.id);
+      for (const s of chIds) {
+        if (s === "") {
+          throw new Error("empty channel identifier");
         }
+        const matches = pChannels.filter(c => c.code === s || c.name === s);
+        if (matches.length === 0) {
+          throw new Error(`invalid channel identifier: ${s}`);
+        } else if (matches.length > 1) {
+          throw new Error(`non-unique channel identifier: ${s}`);
+        }
+        assignedIds.push(matches[0].id);
       }
+    }
+
+    db.prepare("DELETE FROM api_channel_checks WHERE check_id = ?").run(check.id);
+    for (const chId of assignedIds) {
+      db.prepare("INSERT INTO api_channel_checks (channel_id, check_id) VALUES (?, ?)").run(chId, check.id);
     }
   }
 
@@ -332,8 +384,12 @@ for (const prefix of apiPaths) {
     }
 
     if (existingCheck) {
-      const updated = updateCheckFromSpec(existingCheck, body, req.v!);
-      return res.status(200).json(checkToDict(updated, req.readonly, req.v, getReqSiteRoot(req)));
+      try {
+        const updated = updateCheckFromSpec(existingCheck, body, req.v!);
+        return res.status(200).json(checkToDict(updated, req.readonly, req.v, getReqSiteRoot(req)));
+      } catch (e: any) {
+        return res.status(400).json({ error: e.message });
+      }
     }
 
     // Create new check
@@ -354,9 +410,13 @@ for (const prefix of apiPaths) {
     `).run(newCode, project.id, nowStr, newBadgeKey);
 
     const check = db.prepare("SELECT * FROM checks WHERE code = ?").get(newCode) as CheckRow;
-    const updated = updateCheckFromSpec(check, body, req.v!);
-
-    res.status(201).json(checkToDict(updated, req.readonly, req.v, getReqSiteRoot(req)));
+    try {
+      const updated = updateCheckFromSpec(check, body, req.v!);
+      res.status(201).json(checkToDict(updated, req.readonly, req.v, getReqSiteRoot(req)));
+    } catch (e: any) {
+      db.prepare("DELETE FROM checks WHERE code = ?").run(newCode);
+      return res.status(400).json({ error: e.message });
+    }
   });
 
   // CORS & Method checks for single check
@@ -415,8 +475,12 @@ for (const prefix of apiPaths) {
       return res.status(400).json({ error: valError });
     }
 
-    const updated = updateCheckFromSpec(check, req.body, req.v!);
-    res.json(checkToDict(updated, req.readonly, req.v, getReqSiteRoot(req)));
+    try {
+      const updated = updateCheckFromSpec(check, req.body, req.v!);
+      res.json(checkToDict(updated, req.readonly, req.v, getReqSiteRoot(req)));
+    } catch (e: any) {
+      res.status(400).json({ error: e.message });
+    }
   });
 
   // DELETE single check
@@ -539,12 +603,89 @@ for (const prefix of apiPaths) {
 
     const pingNumber = parseInt(req.params.n, 10);
     const ping = db.prepare("SELECT * FROM pings WHERE check_id = ? AND n = ?").get(check.id, pingNumber) as any;
-    if (!ping || ping.body === null || ping.body === undefined) {
+    if (!ping || ping.body === null || ping.body === undefined || ping.body === "") {
       return res.status(404).send("Not Found");
     }
 
     res.setHeader("Content-Type", "text/plain");
     res.send(ping.body);
+  });
+
+  // POST notification status
+  router.post(`${prefix}/notifications/:code/status`, (req: Request, res: Response) => {
+    res.status(200).send("OK");
+  });
+
+  // CORS & Method checks for flips
+  router.all([`${prefix}/checks/:code/flips/`, `${prefix}/checks/:code/flips`], (req, res, next) => {
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    res.setHeader("Access-Control-Allow-Headers", "X-Api-Key");
+    res.setHeader("Access-Control-Allow-Methods", "GET, OPTIONS");
+    res.setHeader("Access-Control-Max-Age", "600");
+    if (req.method === "OPTIONS") {
+      res.writeHead(204, {
+        "Content-Type": "text/html",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Headers": "X-Api-Key",
+        "Access-Control-Allow-Methods": "GET, OPTIONS",
+        "Access-Control-Max-Age": "600"
+      });
+      return res.end();
+    }
+    if (req.method !== "GET") {
+      return res.status(405).send("Method Not Allowed");
+    }
+    next();
+  });
+
+  // GET flips
+  router.get([`${prefix}/checks/:code/flips/`, `${prefix}/checks/:code/flips`], authorizeApiRead, (req: AuthenticatedRequest, res: Response) => {
+    const codeOrKey = req.params.code;
+    let check: CheckRow | null = null;
+    if (codeOrKey.length === 40) {
+      const userChecks = db.prepare("SELECT * FROM checks WHERE project_id = ?").all(req.project!.id) as CheckRow[];
+      for (const c of userChecks) {
+        if (getUniqueKey(c.code) === codeOrKey) {
+          check = c;
+          break;
+        }
+      }
+    } else {
+      check = db.prepare("SELECT * FROM checks WHERE code = ? AND project_id = ?").get(codeOrKey, req.project!.id) as CheckRow || null;
+    }
+
+    if (!check) {
+      return res.status(404).send("Not Found");
+    }
+
+    res.json({ flips: [] });
+  });
+
+  // GET status
+  router.get([`${prefix}/status/`, `${prefix}/status`], (req: Request, res: Response) => {
+    try {
+      db.prepare("SELECT 1").get();
+      res.setHeader("Content-Type", "text/html; charset=utf-8");
+      res.status(200).send("OK");
+    } catch (e) {
+      res.status(500).send("Internal Server Error");
+    }
+  });
+
+  // GET global metrics
+  router.get([`${prefix}/metrics/`, `${prefix}/metrics`], (req: Request, res: Response) => {
+    const metricsKey = process.env.METRICS_KEY || "";
+    const key = req.headers["x-metrics-key"];
+    if (!metricsKey || key !== metricsKey) {
+      return res.status(403).send("Forbidden");
+    }
+    const maxPing = db.prepare("SELECT MAX(id) as maxId FROM pings").get() as any;
+    res.json({
+      ts: Math.floor(Date.now() / 1000),
+      max_ping_id: maxPing ? maxPing.maxId : null,
+      max_notification_id: null,
+      num_unprocessed_flips: 0
+    });
   });
 }
 

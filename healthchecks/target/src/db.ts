@@ -18,6 +18,7 @@ db.exec(`
   CREATE TABLE IF NOT EXISTS profiles (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id INTEGER UNIQUE,
+    token TEXT DEFAULT '',
     check_limit INTEGER DEFAULT 20,
     sms_limit INTEGER DEFAULT 0,
     sms_sent INTEGER DEFAULT 0,
@@ -136,6 +137,7 @@ db.exec(`
 
 try { db.exec("ALTER TABLE checks ADD COLUMN last_start_rid TEXT"); } catch (e) {}
 try { db.exec("ALTER TABLE checks ADD COLUMN has_confirmation_link INTEGER DEFAULT 0"); } catch (e) {}
+try { db.exec("ALTER TABLE profiles ADD COLUMN token TEXT DEFAULT ''"); } catch (e) {}
 
 export function resetDatabase() {
   db.transaction(() => {

@@ -73,7 +73,7 @@ export function processPing(
 
   const ridStr = req.query.rid as string | undefined;
   let rid: string | null = null;
-  if (ridStr !== undefined && ridStr !== "") {
+  if (ridStr !== undefined) {
     const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i;
     if (!uuidRegex.test(ridStr)) {
       return { status: 400, text: "invalid uuid format" };
